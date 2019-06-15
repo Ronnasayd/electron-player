@@ -1,0 +1,207 @@
+body{
+    background:#000000;
+    color: white;
+    font-family: 'sans-serif'
+}
+.video-player{
+    position: absolute;
+    $top:50%;
+    $left:50%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    display: inline-flex;
+    & > video{
+        &:focus{
+            outline: none;
+        }
+    }
+}
+.video-controls{
+    width: 100%;
+    height: 50px;
+    position: absolute;
+    bottom: 0;
+    background: rgba(0,0,0,0.75);
+    display: none;
+    z-index: 10;
+}
+
+.pp-button{
+    position: absolute;
+    $top:50%;
+    $left:5%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    cursor: pointer;
+    &:hover{
+        background: #990000;
+        border-radius: 2px;
+        padding: 5px 5px;
+    }
+}
+
+.fullscrean{
+    position: absolute;
+    $top:50%;
+    $left:95%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    cursor: pointer;
+    &:hover{
+        background: #990000;
+        border-radius: 2px;
+        padding: 5px 5px;
+    }
+}
+
+.previous{
+    position: absolute;
+    $top:50%;
+    $left:10%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    cursor: pointer;
+    &:hover{
+        background: #990000;
+        border-radius: 2px;
+        padding: 5px 5px;
+    }
+}
+
+.next{
+    position: absolute;
+    $top:50%;
+    $left:15%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    cursor: pointer;
+    &:hover{
+        background: #990000;
+        border-radius: 2px;
+        padding: 5px 5px;
+    }
+}
+
+.step-previous{
+    position: absolute;
+    $top:50%;
+    $left:20%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    cursor: pointer;
+    &:hover{
+        background: #990000;
+        border-radius: 2px;
+        padding: 5px 5px;
+    }
+}
+.skip-button{
+    width: 100px;
+    font-weight: 800;
+    position: absolute;
+    $top:80%;
+    $left:90%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    background: #990000;
+    border-radius: 2px;
+    padding: 5px 5px;
+    cursor: pointer;
+    display: none;
+   
+}
+
+.step-next{
+    position: absolute;
+    $top:50%;
+    $left:25%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    cursor: pointer;
+    &:hover{
+        background: #990000;
+        border-radius: 2px;
+        padding: 5px 5px;
+    }
+}
+
+.timer{
+    font-family: 'sans-serif';
+    font-weight:800;
+    position: absolute;
+    $top:50%;
+    $left:35%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    cursor: pointer;
+}
+#pin-button{
+    cursor: pointer;
+    background: #990000;
+    border: none;
+    color: white;
+    &:focus{
+        outline: none;
+    }
+}
+
+
+.slider-container{
+    position: absolute;
+    $top:-10px;
+    $left:0%;
+    top: $top;
+    left: $left;
+    cursor: pointer;
+}
+.slider{
+    appearance: none;
+    border-radius: 5px;
+    height: 8px;
+    background: #d3d3d3;
+    outline: none;
+    width: 765px;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%; 
+    background: #990000;
+    cursor: pointer;
+  }
+
+.skip-menu{
+    position: absolute;
+    $top:50%;
+    $left:90%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    cursor: pointer;
+    & > select{
+        font-weight: 800;
+        border: none;
+        color: white;
+        background: #990000;
+        outline: none;
+        
+        }
+    }
+
+
+
+
+#pause-button{
+    display: none;
+}

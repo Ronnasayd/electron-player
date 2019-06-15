@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="static/libs/fontawesome/css/all.css">
+    <link rel="stylesheet" href="static/dist/css/core.min.css">
+    <title>Electron-player</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+</head>
+
+<body>
+    <div class="video-player">
+        <video id="player" width="768" height="432">
+            <source src="http://localhost:8000/3.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="pin-button">
+            <button id="pin-button"><i class="fas fa-thumbtack"></i></button>
+        </div>
+
+        <div class="skip-button">
+            <i class="fas fa-share"></i>
+            <span> Skip intro</span>
+        </div>
+
+        <div class="video-controls">
+            <div class="slider-container">
+                <input type="range" min="1" max="100" value="0" class="slider">
+            </div>
+            <div class="pp-button">
+                <i id="play-button" class="fas fa-play"></i>
+                <i id="pause-button" class="fas fa-pause"></i>
+            </div>
+            <div class="fullscrean">
+                <i class="fas fa-compress"></i>
+            </div>
+            <div class="previous">
+                <i class="fas fa-backward"></i>
+            </div>
+            <div class="next">
+                <i class="fas fa-forward"></i>
+            </div>
+            <div class="step-previous">
+                <i class="fas fa-step-backward"></i>
+            </div>
+            <div class="step-next">
+                <i class="fas fa-step-forward"></i>
+            </div>
+            <div class="timer">
+                <span>00:00</span>
+            </div>
+            <div class="skip-menu">
+                <select name="skip-menu-select" id="">
+                    <option value="0">No-Skip</option>
+                    <option value="1">Manual-Skip</option>
+                    <option value="2">Auto-Skip</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+</body>
+<script src="https://momentjs.com/downloads/moment.js"></script>
+<script src="static/dist/js/player.min.js"></script>
+
+</html>
