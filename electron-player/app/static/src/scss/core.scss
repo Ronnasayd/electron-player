@@ -1,6 +1,7 @@
 body{
-    background:black;
+    background:#000000;
     color: white;
+    font-family: 'sans-serif'
 }
 .video-player{
     position: absolute;
@@ -100,6 +101,23 @@ body{
         padding: 5px 5px;
     }
 }
+.skip-button{
+    width: 100px;
+    font-weight: 800;
+    position: absolute;
+    $top:80%;
+    $left:90%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    background: #990000;
+    border-radius: 2px;
+    padding: 5px 5px;
+    cursor: pointer;
+    display: none;
+   
+}
+
 .step-next{
     position: absolute;
     $top:50%;
@@ -162,6 +180,28 @@ body{
     background: #990000;
     cursor: pointer;
   }
+
+.skip-menu{
+    position: absolute;
+    $top:50%;
+    $left:90%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    cursor: pointer;
+    & > select{
+        font-weight: 800;
+        border: none;
+        color: white;
+        background: #990000;
+        outline: none;
+        
+        }
+    }
+
+
+
+
 #pause-button{
     display: none;
 }

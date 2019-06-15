@@ -15,11 +15,16 @@
 <body>
     <div class="video-player">
         <video id="player" width="768" height="432">
-            <source src="" type="video/mp4">
+            <source src="http://localhost:8000/3.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <div class="pin-button">
             <button id="pin-button"><i class="fas fa-thumbtack"></i></button>
+        </div>
+
+        <div class="skip-button">
+            <i class="fas fa-share"></i>
+            <span> Skip intro</span>
         </div>
 
         <div class="video-controls">
@@ -48,6 +53,13 @@
             <div class="timer">
                 <span>00:00 / 00:00</span>
             </div>
+            <div class="skip-menu">
+                <select name="skip-menu-select" id="">
+                    <option value="0">No-Skip</option>
+                    <option value="1">Manual-Skip</option>
+                    <option value="2">Auto-Skip</option>
+                </select>
+            </div>
 
         </div>
     </div>
@@ -61,13 +73,17 @@
         list_of_files = files
         videoplayer.src = list_of_files[contador].path
         videoplayer.play()
+        notification = new Notification(list_of_files[contador].fullPath)
+        setTimeout(notification.close.bind(notification), 1000);
+        setInterval(incrementSeconds, 1000)
     })
 
     videoplayer.onended = function () {
         contador++
         videoplayer.src = list_of_files[contador].path
         videoplayer.play()
-        console.log(list_of_files)
+        notification = new Notification(list_of_files[contador].fullPath)
+        setTimeout(notification.close.bind(notification), 1000);
     }
 
     $('.next').click(function () {
@@ -76,6 +92,8 @@
         }
         videoplayer.src = list_of_files[contador].path
         videoplayer.play()
+        notification = new Notification(list_of_files[contador].fullPath)
+        setTimeout(notification.close.bind(notification), 1000);
 
     })
     $('.previous').click(function () {
@@ -85,6 +103,8 @@
         }
         videoplayer.src = list_of_files[contador].path
         videoplayer.play()
+        notification = new Notification(list_of_files[contador].fullPath)
+        setTimeout(notification.close.bind(notification), 1000);
 
     })
 </script>
