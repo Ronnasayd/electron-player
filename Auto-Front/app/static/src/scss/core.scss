@@ -24,8 +24,9 @@ body{
     bottom: 0;
     background: rgba(0,0,0,0.75);
     display: none;
-    z-index: 10;
+    z-index: 2147483647;
 }
+
 
 .pp-button{
     position: absolute;
@@ -45,7 +46,7 @@ body{
 .fullscrean{
     position: absolute;
     $top:50%;
-    $left:95%;
+    $left:92%;
     top: $top;
     left: $left;
     transform: translate(-$left,-$top);
@@ -116,7 +117,8 @@ body{
     cursor: pointer;
     display: none;
     text-align: center;
-   
+    z-index: 2147483647;
+
 }
 
 .step-next{
@@ -149,6 +151,7 @@ body{
     cursor: pointer;
     background: #990000;
     border: none;
+    padding: 8px;
     color: white;
     &:focus{
         outline: none;
@@ -170,7 +173,7 @@ body{
     height: 8px;
     background: #d3d3d3;
     outline: none;
-    width: 765px;
+    width: 755px;
 }
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -185,7 +188,7 @@ body{
 .skip-menu{
     position: absolute;
     $top:50%;
-    $left:90%;
+    $left:85%;
     top: $top;
     left: $left;
     transform: translate(-$left,-$top);
@@ -206,3 +209,11 @@ body{
 #pause-button{
     display: none;
 }
+
+// video::-webkit-media-controls {
+//     display:none !important;
+// }
+
+// video::-webkit-media-controls-enclosure {
+//     display:none !important;
+// }

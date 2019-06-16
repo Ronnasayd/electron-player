@@ -57,7 +57,7 @@
                 <span>00:00 / 00:00</span>
             </div>
             <div class="skip-menu">
-                <select name="skip-menu-select" id="">
+                <select name="skip-menu-select" id="skip-menu">
                     <option value="0">No-Skip</option>
                     <option value="1">Manual-Skip</option>
                     <option value="2">Auto-Skip</option>
@@ -78,24 +78,50 @@
     let skipList = []
     let skipContent;
     let fases = { 'init_intro': 0, 'end_intro': 0, 'end_end': 0 }
+    let skipMode = "0"
 
     let init_intro = 0
     let end_intro = 0
     let end_end = 0
 
+    let skipSwitch = () => {
+
+        switch (skipMode) {
+            case "0":
+                console.log('no-skip')
+                $('#pin-button').fadeIn()
+                break;
+            case "1":
+                $('#pin-button').fadeOut()
+                console.log('manual-skip')
+                if ((videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) || videoplayer.currentTime >= end_end) {
+                    $('.skip-button').fadeIn()
+                }
+                else {
+                    $('.skip-button').fadeOut()
+                }
+                break;
+            case "2":
+                $('#pin-button').fadeOut()
+                console.log('auto-skip')
+                if (videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) {
+                    videoplayer.currentTime = end_intro
+                }
+                if (videoplayer.currentTime > end_intro && videoplayer.currentTime >= end_end) {
+                    $('.next').click()
+                }
+                break;
+        }
+    }
+
     let incrementSeconds = () => {
+        skipSwitch()
         timerText = moment(videoplayer.currentTime * 1000).format('mm:ss')
         totalTimeText = moment(videoplayer.duration * 1000).format('mm:ss')
         $('.timer>span').text(timerText + ' / ' + totalTimeText)
         $('.slider').val(100 * videoplayer.currentTime / videoplayer.duration)
 
-        if ((videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) || videoplayer.currentTime >= end_end) {
-            console.log('skip-intreo')
-            $('.skip-button').fadeIn()
-        }
-        else {
-            $('.skip-button').fadeOut()
-        }
+
 
 
     }
@@ -228,6 +254,10 @@
             $('.next').click()
         }
 
+    })
+
+    $('#skip-menu').click(() => {
+        skipMode = $('#skip-menu').val()
     })
 </script>
 
