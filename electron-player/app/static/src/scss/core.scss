@@ -102,7 +102,7 @@ body{
     }
 }
 .skip-button{
-    width: 100px;
+    width: 75px;
     font-weight: 800;
     position: absolute;
     $top:80%;
@@ -115,6 +115,7 @@ body{
     padding: 5px 5px;
     cursor: pointer;
     display: none;
+    text-align: center;
    
 }
 

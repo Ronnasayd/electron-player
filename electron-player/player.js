@@ -3,12 +3,7 @@ var pp_list = ['play', 'pause']
 var videoplayer = $('#player')[0]
 let list_of_files = []
 
-let incrementSeconds = () => {
-    timerText = moment(videoplayer.currentTime * 1000).format('mm:ss')
-    totalTimeText = moment(videoplayer.duration * 1000).format('mm:ss')
-    $('.timer>span').text(timerText + ' / ' + totalTimeText)
-    $('.slider').val(100 * videoplayer.currentTime / videoplayer.duration)
-}
+
 
 
 
@@ -61,7 +56,5 @@ $('.slider').click(function () {
     videoplayer.currentTime = videoplayer.duration * ($(this).val() / 100)
 })
 
-$('#pin-button').click(function () {
-    console.log(videoplayer.currentTime)
-})
+
 
