@@ -15,7 +15,7 @@
 <body>
     <div class="video-player">
         <video id="player" width="768" height="432">
-            <source src="http://localhost:8000/3.mp4" type="video/mp4">
+            <source type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <div class="pin-button">
@@ -152,12 +152,13 @@
                 return element
             }
         })
+        console.log(skipFile)
         if (skipFile === undefined) {
             console.log('arquivo nao existe')
         }
         else {
             console.log('arquivo existe')
-            skipContent = JSON.parse(fs.readFileSync(files[0].path.split(files[0].fullPath)[0] + '/electron.skip', 'utf8'))
+            skipContent = JSON.parse(fs.readFileSync(skipFile.path, 'utf8'))
             initalizeBySkip(contador)
             skipList = skipContent
         }

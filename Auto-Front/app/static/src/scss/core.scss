@@ -18,7 +18,7 @@ body{
     }
 }
 .video-controls{
-    width: 100%;
+    width: 768px;
     height: 50px;
     position: absolute;
     bottom: 0;
@@ -46,7 +46,7 @@ body{
 .fullscrean{
     position: absolute;
     $top:50%;
-    $left:92%;
+    $left:95%;
     top: $top;
     left: $left;
     transform: translate(-$left,-$top);
@@ -148,6 +148,9 @@ body{
     cursor: pointer;
 }
 #pin-button{
+    font-weight: 800;
+    display: inline-flex;
+    float: right;
     cursor: pointer;
     background: #990000;
     border: none;
@@ -160,6 +163,7 @@ body{
 
 
 .slider-container{
+    width: 100%;
     position: absolute;
     $top:-10px;
     $left:0%;
@@ -168,6 +172,7 @@ body{
     cursor: pointer;
 }
 .slider{
+    width: 100% !important;
     appearance: none;
     border-radius: 5px;
     height: 8px;
@@ -188,7 +193,7 @@ body{
 .skip-menu{
     position: absolute;
     $top:50%;
-    $left:85%;
+    $left:90%;
     top: $top;
     left: $left;
     transform: translate(-$left,-$top);
@@ -202,7 +207,12 @@ body{
         
         }
     }
-
+    #player{
+        min-width: 768px;
+        min-height: 432px;
+        max-width: 768px;
+        max-height: 432px;
+    }
 
 
 
@@ -217,3 +227,4 @@ body{
 // video::-webkit-media-controls-enclosure {
 //     display:none !important;
 // }
+
