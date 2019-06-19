@@ -1,7 +1,9 @@
 body{
     background:#000000;
     color: white;
-    font-family: 'sans-serif'
+    font-family: 'sans-serif';
+    margin: 0;
+    padding: 0;
 }
 .video-player{
     position: absolute;
@@ -24,7 +26,8 @@ body{
     bottom: 0;
     background: rgba(0,0,0,0.75);
     display: none;
-    z-index: 2147483647;
+    z-index:2147483647 !important;
+    
 }
 
 
@@ -46,7 +49,7 @@ body{
 .fullscrean{
     position: absolute;
     $top:50%;
-    $left:95%;
+    $left:96%;
     top: $top;
     left: $left;
     transform: translate(-$left,-$top);
@@ -56,6 +59,19 @@ body{
         border-radius: 2px;
         padding: 5px 5px;
     }
+}
+
+.sound{
+    display: inline-flex;
+    position: absolute;
+    $top:50%;
+    $left:57.5%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+    cursor: pointer;
+   
+    
 }
 
 .previous{
@@ -161,26 +177,60 @@ body{
     }
 }
 
+#play-list{
+    font-weight: 800;
+    display: inline-flex;
+    float: right;
+    cursor: pointer;
+    background: #990000;
+    border: none;
+    padding: 10px;
+    color: white;
+    &:focus{
+        outline: none;
+    }
+}
+
 
 .slider-container{
     width: 100%;
     position: absolute;
-    $top:-10px;
+    $top:-40%;
     $left:0%;
     top: $top;
     left: $left;
+    transform: translate(-$left,-$top);
     cursor: pointer;
 }
 .slider{
-    width: 100% !important;
+    width: 99.5%;
     appearance: none;
     border-radius: 5px;
     height: 8px;
-    background: #d3d3d3;
+    background: white;
     outline: none;
-    width: 755px;
 }
 .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%; 
+    background: #990000;
+    cursor: pointer;
+  }
+
+  .slider-sound{
+    position: relative;
+    top: 2px;
+    width: 100%;
+    appearance: none;
+    border-radius: 5px;
+    height: 8px;
+    background: white;
+    outline: none;
+}
+.slider-sound::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 10px;
@@ -216,7 +266,7 @@ body{
 
 
 
-#pause-button{
+#play-button{
     display: none;
 }
 
@@ -227,4 +277,6 @@ body{
 // video::-webkit-media-controls-enclosure {
 //     display:none !important;
 // }
-
+// video:fullscreen{
+//     z-index: 10;
+// }

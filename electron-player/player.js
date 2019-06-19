@@ -58,3 +58,193 @@ $('.slider').click(function () {
 
 
 
+const fs = require('fs');
+const dragDrop = require('drag-drop')
+let contador = 0
+let video_types = ['.mp4', '.mvk', '.avi']
+let skipList = []
+let counterPinClick = 1
+let skipContent;
+let fases = { 'init_intro': 0, 'end_intro': 0, 'end_end': 0 }
+let skipMode = "0"
+
+let init_intro = 0
+let end_intro = 0
+let end_end = 0
+
+let skipSwitch = () => {
+
+    switch (skipMode) {
+        case "0":
+            $('#pin-button').fadeIn()
+            break;
+        case "1":
+            $('#pin-button').fadeOut()
+            if ((videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) || videoplayer.currentTime >= end_end) {
+                $('.skip-button').fadeIn()
+            }
+            else {
+                $('.skip-button').fadeOut()
+            }
+            break;
+        case "2":
+            $('#pin-button').fadeOut()
+            if (videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) {
+                videoplayer.currentTime = end_intro
+            }
+            if (videoplayer.currentTime > end_intro && videoplayer.currentTime >= end_end) {
+                $('.next').click()
+            }
+            break;
+    }
+}
+
+let incrementSeconds = () => {
+    skipSwitch()
+    timerText = moment(videoplayer.currentTime * 1000).format('mm:ss')
+    totalTimeText = moment(videoplayer.duration * 1000).format('mm:ss')
+    $('.timer>span').text(timerText + ' / ' + totalTimeText)
+    $('.slider').val(100 * videoplayer.currentTime / videoplayer.duration)
+
+
+
+
+}
+
+let initalizeBySkip = (contador) => {
+    skipContent.filter((element, index) => {
+        if (index === contador) {
+            init_intro = element[index].init_intro
+            end_intro = element[index].end_intro
+            end_end = element[index].end_end
+            // console.log(init_intro, end_intro, end_end)
+            return element
+        }
+    })
+}
+
+let verifyVideoType = (file) => {
+    prod = 0
+    video_types.forEach((e, i) => {
+        prod += file.fullPath.includes(e)
+    })
+    return prod
+}
+
+dragDrop('body', function (files) {
+    skipFile = files.find((element) => {
+        if (element.fullPath.includes('.skip')) {
+            return element
+        }
+    })
+    console.log(skipFile)
+    if (skipFile === undefined) {
+        console.log('arquivo nao existe')
+    }
+    else {
+        console.log('arquivo existe')
+        skipContent = JSON.parse(fs.readFileSync(skipFile.path, 'utf8'))
+        initalizeBySkip(contador)
+        skipList = skipContent
+    }
+    files = files.filter((element) => {
+        return verifyVideoType(element)
+    })
+    list_of_files = files.sort(function (a, b) {
+        if (verifyVideoType(a) && verifyVideoType(b)) {
+            if (a.fullPath < b.fullPath) {
+                return -1
+            }
+            else {
+                return 1
+            }
+        }
+
+    })
+    console.log(list_of_files)
+    videoplayer.src = list_of_files[contador].path
+    videoplayer.play()
+    notification = new Notification(list_of_files[contador].fullPath)
+    setTimeout(notification.close.bind(notification), 1000);
+    setInterval(incrementSeconds, 1000)
+})
+
+videoplayer.onended = function () {
+    contador++
+    videoplayer.src = list_of_files[contador].path
+    videoplayer.play()
+    notification = new Notification(list_of_files[contador].fullPath)
+    setTimeout(notification.close.bind(notification), 1000);
+}
+
+$('.next').click(function () {
+    if (contador >= 0 && contador < list_of_files.length - 1) {
+        contador++
+    }
+    videoplayer.src = list_of_files[contador].path
+    videoplayer.play()
+    initalizeBySkip(contador)
+    notification = new Notification(list_of_files[contador].fullPath)
+    setTimeout(notification.close.bind(notification), 1000);
+
+})
+$('.previous').click(function () {
+    if (contador >= 1 && contador <= list_of_files.length) {
+        contador--
+
+    }
+    videoplayer.src = list_of_files[contador].path
+    videoplayer.play()
+    initalizeBySkip(contador)
+    notification = new Notification(list_of_files[contador].fullPath)
+    setTimeout(notification.close.bind(notification), 1000);
+
+})
+
+$('#pin-button').click(function () {
+
+
+    switch (counterPinClick) {
+        case 1:
+            fases.init_intro = videoplayer.currentTime
+            break;
+        case 2:
+            fases.end_intro = videoplayer.currentTime
+            break;
+        case 3:
+            fases.end_end = videoplayer.currentTime
+            skipList[contador] = { [contador]: JSON.parse(JSON.stringify(fases)) }
+            fases = { 'init_intro': 0, 'end_intro': 0, 'end_end': 0 }
+            index = list_of_files[0].path.lastIndexOf('/')
+            fs.writeFile(list_of_files[0].path.slice(0, index) + '/electron.skip', JSON.stringify(skipList), (err) => {
+                console.log(err)
+            })
+            break;
+    }
+
+    counterPinClick++
+    if (counterPinClick > 3) {
+        counterPinClick = 1
+    }
+    $('#pin-button>span').text(counterPinClick)
+
+
+})
+
+$('.skip-button').click(() => {
+    if (videoplayer.currentTime <= end_intro) {
+        videoplayer.currentTime = end_intro
+    }
+    if (videoplayer.currentTime > end_intro && videoplayer.currentTime >= end_end) {
+        $('.next').click()
+    }
+
+})
+
+$('#skip-menu').click(() => {
+    skipMode = $('#skip-menu').val()
+})
+
+$('.sound').click(() => {
+    videoplayer.volume = $('.slider-sound').val() / 100
+})
