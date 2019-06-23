@@ -166,7 +166,6 @@ body{
 #pin-button{
     font-weight: 800;
     display: inline-flex;
-    float: right;
     cursor: pointer;
     background: #990000;
     border: none;
@@ -180,7 +179,6 @@ body{
 #play-list{
     font-weight: 800;
     display: inline-flex;
-    float: right;
     cursor: pointer;
     background: #990000;
     border: none;
@@ -280,3 +278,68 @@ body{
 // video:fullscreen{
 //     z-index: 10;
 // }
+div.side-menu{
+    display: none;
+}
+div.side-menu > ul {
+    max-height: 369px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: scroll;
+    background: #990000;
+    & > li{
+        cursor: pointer;
+        border-bottom: 0.5px solid white;
+        width: 200px;
+        height: 64px;
+    }
+}
+
+
+.file-relative{
+    width: 100%;
+    display: inline-flex;
+    position: relative;
+}
+.file-img {
+
+    & >img{
+        padding: 7px;
+        width: 50px;
+        height: 50px;
+        border-radius: 100%;
+    }
+  
+}
+.file-title{
+    position: absolute;
+    $top:50%;
+    $left:50%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+}
+
+.file-time{
+    position: absolute;
+    $top:85%;
+    $left:90%;
+    top: $top;
+    left: $left;
+    transform: translate(-$left,-$top);
+}
+
+div.file-title > span{
+    font-weight: 800;
+}
+
+div.file-time > span{
+font-size: 12px;
+font-weight: 800;
+}
+
+#side-menu-ul > li:hover{
+    background: white;
+    color: #990000;
+}

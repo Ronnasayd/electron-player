@@ -1,11 +1,7 @@
 
-var pp_list = ['play', 'pause']
+var pp_list = ['play', 'pause'].reverse()
 var videoplayer = $('#player')[0]
 let list_of_files = []
-
-
-
-
 
 $('#player, .video-controls').mouseenter(function () {
     $('.video-controls').fadeIn()
@@ -57,20 +53,30 @@ $('.slider').click(function () {
 })
 
 
-
+const VideoLib = require('node-video-lib');
 const fs = require('fs');
 const dragDrop = require('drag-drop')
 let contador = 0
-let video_types = ['.mp4', '.mvk', '.avi']
+let video_types = ['.mp4', '.mkv', '.avi']
 let skipList = []
 let counterPinClick = 1
 let skipContent;
 let fases = { 'init_intro': 0, 'end_intro': 0, 'end_end': 0 }
 let skipMode = "0"
-
+let app
 let init_intro = 0
 let end_intro = 0
 let end_end = 0
+const ThumbnailGenerator = require('video-thumbnail-generator').default;
+let playlist = []
+let addZero = (element) => {
+    if (element.length === 2) {
+        return element
+    }
+    else {
+        return "0" + element
+    }
+}
 
 let skipSwitch = () => {
 
@@ -132,6 +138,7 @@ let verifyVideoType = (file) => {
 }
 
 dragDrop('body', function (files) {
+    playlist = []
     skipFile = files.find((element) => {
         if (element.fullPath.includes('.skip')) {
             return element
@@ -150,6 +157,7 @@ dragDrop('body', function (files) {
     files = files.filter((element) => {
         return verifyVideoType(element)
     })
+    console.log(files)
     list_of_files = files.sort(function (a, b) {
         if (verifyVideoType(a) && verifyVideoType(b)) {
             if (a.fullPath < b.fullPath) {
@@ -162,6 +170,59 @@ dragDrop('body', function (files) {
 
     })
     console.log(list_of_files)
+    list_of_files.forEach((e, i) => {
+        file = {}
+        index = list_of_files[0].path.lastIndexOf('/')
+        list_of_files[0].path.slice(0, index)
+        const tg = new ThumbnailGenerator({
+            sourcePath: e.path,
+            thumbnailPath: list_of_files[0].path.slice(0, index) + '/.thumb',
+            tmpDir: '/some/writeable/directory' //only required if you can't write to /tmp/ and you need to generate gifs
+        });
+
+        tg.generateOneByPercent(50)
+        // .then(console.log);
+
+        fs.open(e.path, 'r', function (err, fd) {
+            try {
+                let movie = VideoLib.MovieParser.parse(fd);
+                file.img = list_of_files[0].path.slice(0, index) + '/.thumb/' + addZero((i + 1).toString()) + '-thumbnail-320x240-0001.png'
+                file.title = e.name
+                file.time = moment(movie.relativeDuration() * 1000).format('mm:ss')
+                file.path = e.path
+                file.counter = i
+                playlist.push(JSON.parse(JSON.stringify(file)))
+                // Work with movie
+                // console.log('Duration:',
+                //     moment(movie.relativeDuration() * 1000).format('mm:ss')
+                // );
+            } catch (ex) {
+                console.error('Error:', ex);
+            } finally {
+                fs.closeSync(fd);
+            }
+        });
+    })
+    console.log(playlist)
+    app = new Vue({
+        el: ' #side-menu-ul',
+        data: {
+            files: playlist
+        },
+        methods: {
+            jump: (file) => {
+                console.log(file.path)
+                videoplayer.src = file.path
+                videoplayer.play()
+                notification = new Notification(file.title)
+                setTimeout(notification.close.bind(notification), 1000);
+                setInterval(incrementSeconds, 1000)
+                contador = file.counter
+                initalizeBySkip(contador)
+            }
+        }
+    })
+
     videoplayer.src = list_of_files[contador].path
     videoplayer.play()
     notification = new Notification(list_of_files[contador].fullPath)
@@ -248,3 +309,9 @@ $('#skip-menu').click(() => {
 $('.sound').click(() => {
     videoplayer.volume = $('.slider-sound').val() / 100
 })
+
+$('#play-list').click(() => {
+    console.log('list')
+    $('.side-menu').toggle()
+})
+

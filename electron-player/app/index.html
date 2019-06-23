@@ -10,6 +10,7 @@
     <title>Electron-player</title>
     <!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> -->
     <script>window.$ = window.jQuery = require('jquery')</script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 </head>
 
 <body>
@@ -41,7 +42,7 @@
                 <i class="fas fa-forward"></i>
             </div>
             <div class="timer">
-                <span>00:00</span>
+                <span>00:00 / 00:00</span>
             </div>
             <div class="skip-menu">
                 <select name="skip-menu-select" id="skip-menu">
@@ -55,13 +56,12 @@
                 <input type="range" min="0" max="100" value="100" class="slider-sound">
             </div>
         </div>
-        <video id="player" width="768" height="432">
-            <source
-                src="https://r1---sn-uxaxpo4vcg-j28e.googlevideo.com/videoplayback?id=aa574309d1fd4154&itag=18&source=blogger&pl=24&ei=cwUKXc-fKZvaj-8P546euAs&susc=bl&mime=video/mp4&dur=1420.155&lmt=1484772833797989&ip=2607:5300:60:7317::&ipbits=0&expire=1560966643&sparams=dur,ei,expire,id,ip,ipbits,ipbypass,itag,lmt,mime,mip,mm,mn,ms,mv,pl,source,susc&signature=6CB9A2B75BA36BEF302552347F4187A68DD518ED.5CADD1BE275E662A0538C7AA561B3517E4565D2B&key=cms1&redirect_counter=1&rm=sn-p5qyr7d&req_id=4c847605340236e2&cms_redirect=yes&ipbypass=yes&mip=170.84.145.170&mm=31&mn=sn-uxaxpo4vcg-j28e&ms=au&mt=1560942275&mv=m"
-                type="video/mp4">
+        <video id="player" width="768" height="432" autoplay>
+            <source src="http://localhost:8000/02.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <div class="lateral-menu">
+
             <div class="pin-button">
                 <button id="pin-button">
                     <i class="fas fa-thumbtack"></i>
@@ -73,8 +73,22 @@
                     <i class="fas fa-list"></i>
                 </button>
             </div>
-        </div>
+            <div class="side-menu">
+                <ul id="side-menu-ul">
+                    <li v-on:click="jump(file)" v-for="file in files">
+                        <div class="file-relative">
+                            <div class="file-img">
+                                <img v-bind:src="file.img" alt="">
+                            </div>
+                            <div class="file-title"><span>{{file.title}}</span></div>
+                            <div class="file-time"><span>{{file.time}}</span></div>
+                        </div>
+                    </li>
 
+                </ul>
+            </div>
+
+        </div>
 
         <div class="skip-button">
             <i class="fas fa-share"></i>
@@ -82,9 +96,17 @@
         </div>
 
 
+
     </div>
 </body>
 <script src="https://momentjs.com/downloads/moment.js"></script>
 <script src="../player.js"></script>
+<!-- <script>
+    var app2 = new Vue({
+        el: ' #side-menu-ul', data: {
+            files: playlist
+        }
+    })
+</script> -->
 
 </html>

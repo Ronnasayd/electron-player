@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var pp_list = ['play', 'pause']
+    var pp_list = ['play', 'pause'].reverse()
     var videoplayer = $('#player')[0]
 
     setInterval(function () {
