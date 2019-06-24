@@ -69,6 +69,24 @@ let end_intro = 0
 let end_end = 0
 const ThumbnailGenerator = require('video-thumbnail-generator').default;
 let playlist = []
+app = new Vue({
+    el: ' #side-menu-ul',
+    data: {
+        files: playlist
+    },
+    methods: {
+        jump: (file) => {
+            console.log(file.path)
+            videoplayer.src = file.path
+            videoplayer.play()
+            notification = new Notification(file.title)
+            setTimeout(notification.close.bind(notification), 1000);
+            setInterval(incrementSeconds, 1000)
+            contador = file.counter
+            initalizeBySkip(contador)
+        }
+    }
+})
 let addZero = (element) => {
     if (element.length === 2) {
         return element
@@ -114,10 +132,20 @@ let incrementSeconds = () => {
 
 
 
-
 }
 
 let initalizeBySkip = (contador) => {
+    $('#side-menu-ul > li').removeClass('isActive')
+    if (contador === 0) {
+        setTimeout(() => {
+            $('#side-menu-ul > li:nth-child(' + (contador + 1).toString() + ')').addClass('isActive')
+        }, 7000)
+    }
+    else {
+        $('#side-menu-ul > li:nth-child(' + (contador + 1).toString() + ')').addClass('isActive')
+    }
+
+
     skipContent.filter((element, index) => {
         if (index === contador) {
             init_intro = element[index].init_intro
@@ -181,12 +209,12 @@ dragDrop('body', function (files) {
         });
 
         tg.generateOneByPercent(50)
-        // .then(console.log);
+            .then(console.log);
 
         fs.open(e.path, 'r', function (err, fd) {
             try {
                 let movie = VideoLib.MovieParser.parse(fd);
-                file.img = list_of_files[0].path.slice(0, index) + '/.thumb/' + addZero((i + 1).toString()) + '-thumbnail-320x240-0001.png'
+                file.img = list_of_files[0].path.slice(0, index) + '/.thumb/' + e.name.replace(".mp4", "") + '-thumbnail-320x240-0001.png'
                 file.title = e.name
                 file.time = moment(movie.relativeDuration() * 1000).format('mm:ss')
                 file.path = e.path
@@ -202,26 +230,16 @@ dragDrop('body', function (files) {
                 fs.closeSync(fd);
             }
         });
+
+
     })
-    console.log(playlist)
-    app = new Vue({
-        el: ' #side-menu-ul',
-        data: {
-            files: playlist
-        },
-        methods: {
-            jump: (file) => {
-                console.log(file.path)
-                videoplayer.src = file.path
-                videoplayer.play()
-                notification = new Notification(file.title)
-                setTimeout(notification.close.bind(notification), 1000);
-                setInterval(incrementSeconds, 1000)
-                contador = file.counter
-                initalizeBySkip(contador)
-            }
-        }
-    })
+
+
+    setTimeout(() => {
+        app.files = playlist
+        console.log(playlist)
+    }, 5000)
+
 
     videoplayer.src = list_of_files[contador].path
     videoplayer.play()
