@@ -56,10 +56,18 @@
                 <input type="range" min="0" max="100" value="100" class="slider-sound">
             </div>
         </div>
-        <video id="player" width="768" height="432" autoplay>
-            <source src="http://localhost:8000/02.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+        <div class="video-container">
+            <video id="player" width="768" height="432" autoplay>
+                <source src="http://localhost:8000/02.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="skip-button">
+                <i class="fas fa-share"></i>
+                <span> Skip</span>
+            </div>
+
+        </div>
+
         <div class="lateral-menu">
 
             <div class="pin-button">
@@ -90,10 +98,6 @@
 
         </div>
 
-        <div class="skip-button">
-            <i class="fas fa-share"></i>
-            <span> Skip</span>
-        </div>
 
 
 

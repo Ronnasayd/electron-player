@@ -12,7 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 </head>
 
-<body class="isActive">
+<body>
     <div class="video-player">
         <div class="video-controls">
             <div class="slider-container">
@@ -55,10 +55,18 @@
                 <input type="range" min="0" max="100" value="100" class="slider-sound">
             </div>
         </div>
-        <video id="player" width="768" height="432" autoplay>
-            <source src="http://localhost:8000/02.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+        <div class="video-container">
+            <video id="player" width="768" height="432" autoplay>
+                <source src="http://localhost:8000/02.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="skip-button">
+                <i class="fas fa-share"></i>
+                <span> Skip</span>
+            </div>
+
+        </div>
+
         <div class="lateral-menu">
 
             <div class="pin-button">
@@ -74,7 +82,7 @@
             </div>
             <div class="side-menu">
                 <ul id="side-menu-ul">
-                    <li v-for="file in files">
+                    <li v-on:click="jump(file)" v-for="file in files">
                         <div class="file-relative">
                             <div class="file-img">
                                 <img v-bind:src="file.img" alt="">
@@ -89,10 +97,6 @@
 
         </div>
 
-        <div class="skip-button">
-            <i class="fas fa-share"></i>
-            <span> Skip</span>
-        </div>
 
 
 

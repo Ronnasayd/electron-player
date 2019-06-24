@@ -8,6 +8,9 @@ body{
 .isActive{
     background: rgb(66, 6, 6);
 }
+.video-container{
+    position: relative;
+}
 .video-player{
     position: absolute;
     $top:50%;
