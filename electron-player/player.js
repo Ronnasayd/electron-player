@@ -1,7 +1,24 @@
+const VideoLib = require('node-video-lib');
+const fs = require('fs');
+const dragDrop = require('drag-drop')
+const ThumbnailGenerator = require('video-thumbnail-generator').default;
 
 var pp_list = ['play', 'pause'].reverse()
 var videoplayer = $('#player')[0]
 let list_of_files = []
+let contador = 0
+let video_types = ['.mp4', '.mkv', '.avi']
+let skipList = []
+let counterPinClick = 1
+let skipContent;
+let fases = { 'init_intro': 0, 'end_intro': 0, 'end_end': 0 }
+let skipMode = "0"
+let app
+let init_intro = 0
+let end_intro = 0
+let end_end = 0
+let playlist = []
+let counterGenerateThumb = 0
 
 $('#player, .video-controls').mouseenter(function () {
     $('.video-controls').fadeIn()
@@ -53,22 +70,6 @@ $('.slider').click(function () {
 })
 
 
-const VideoLib = require('node-video-lib');
-const fs = require('fs');
-const dragDrop = require('drag-drop')
-let contador = 0
-let video_types = ['.mp4', '.mkv', '.avi']
-let skipList = []
-let counterPinClick = 1
-let skipContent;
-let fases = { 'init_intro': 0, 'end_intro': 0, 'end_end': 0 }
-let skipMode = "0"
-let app
-let init_intro = 0
-let end_intro = 0
-let end_end = 0
-const ThumbnailGenerator = require('video-thumbnail-generator').default;
-let playlist = []
 app = new Vue({
     el: ' #side-menu-ul',
     data: {
@@ -76,7 +77,7 @@ app = new Vue({
     },
     methods: {
         jump: (file) => {
-            console.log(file.path)
+            // console.log(file.path)
             videoplayer.src = file.path
             videoplayer.play()
             notification = new Notification(file.title)
@@ -136,14 +137,8 @@ let incrementSeconds = () => {
 
 let initalizeBySkip = (contador) => {
     $('#side-menu-ul > li').removeClass('isActive')
-    if (contador === 0) {
-        setTimeout(() => {
-            $('#side-menu-ul > li:nth-child(' + (contador + 1).toString() + ')').addClass('isActive')
-        }, 7000)
-    }
-    else {
-        $('#side-menu-ul > li:nth-child(' + (contador + 1).toString() + ')').addClass('isActive')
-    }
+    $('#side-menu-ul > li:nth-child(' + (contador + 1).toString() + ')').addClass('isActive')
+
 
 
     skipContent.filter((element, index) => {
@@ -166,18 +161,21 @@ let verifyVideoType = (file) => {
 }
 
 dragDrop('body', function (files) {
+    counterGenerateThumb = 0
+    contador = 0
     playlist = []
+
     skipFile = files.find((element) => {
         if (element.fullPath.includes('.skip')) {
             return element
         }
     })
-    console.log(skipFile)
+    // console.log(skipFile)
     if (skipFile === undefined) {
-        console.log('arquivo nao existe')
+        // console.log('arquivo nao existe')
     }
     else {
-        console.log('arquivo existe')
+        // console.log('arquivo existe')
         skipContent = JSON.parse(fs.readFileSync(skipFile.path, 'utf8'))
         initalizeBySkip(contador)
         skipList = skipContent
@@ -185,7 +183,7 @@ dragDrop('body', function (files) {
     files = files.filter((element) => {
         return verifyVideoType(element)
     })
-    console.log(files)
+    // console.log(files)
     list_of_files = files.sort(function (a, b) {
         if (verifyVideoType(a) && verifyVideoType(b)) {
             if (a.fullPath < b.fullPath) {
@@ -197,7 +195,7 @@ dragDrop('body', function (files) {
         }
 
     })
-    console.log(list_of_files)
+    // console.log(list_of_files)
     list_of_files.forEach((e, i) => {
         file = {}
         index = list_of_files[0].path.lastIndexOf('/')
@@ -209,7 +207,17 @@ dragDrop('body', function (files) {
         });
 
         tg.generateOneByPercent(50)
-            .then(console.log);
+            .then(() => {
+                counterGenerateThumb++
+                if (counterGenerateThumb === list_of_files.length) {
+                    app.files = playlist
+                    $('#side-menu-ul > li').removeClass('isActive')
+                    setTimeout(() => {
+                        $('#side-menu-ul > li:nth-child(1)').addClass('isActive')
+                    }, 500)
+                    // console.log(app.files)
+                }
+            });
 
         fs.open(e.path, 'r', function (err, fd) {
             try {
@@ -235,10 +243,10 @@ dragDrop('body', function (files) {
     })
 
 
-    setTimeout(() => {
-        app.files = playlist
-        console.log(playlist)
-    }, 5000)
+    // setTimeout(() => {
+    //     app.files = playlist
+    //     // console.log(playlist)
+    // }, 5000)
 
 
     videoplayer.src = list_of_files[contador].path
@@ -335,7 +343,7 @@ $('.sound').click(() => {
 })
 
 $('#play-list').click(() => {
-    console.log('list')
+    // console.log('list')
     $('.side-menu').toggle()
 })
 
