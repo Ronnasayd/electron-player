@@ -325,7 +325,13 @@ $('#skip-menu').click(() => {
 })
 
 $('.sound').click(() => {
-    videoplayer.volume = $('.slider-sound').val() / 100
+    videoplayer.volume = parseFloat($('.slider-sound').val()) / 100
+    if (videoplayer.volume > 1) {
+        videoplayer.volume = 1
+    }
+    if (videoplayer.volume < 0) {
+        videoplayer.volume = 0
+    }
 })
 
 $('#play-list').click(() => {
@@ -333,3 +339,34 @@ $('#play-list').click(() => {
     $('.side-menu').toggle()
 })
 
+onkeydown = (event) => {
+    // console.log(event)
+    switch (event.key) {
+        case "ArrowRight":
+            // console.log("right")
+            $('.step-next').click()
+            break;
+        case "ArrowLeft":
+            // console.log("left")
+            $('.step-previous').click()
+            break;
+        case "Control":
+            // console.log("control")
+            $('#pin-button').click()
+            break;
+        case "ArrowUp":
+            // console.log($('.slider-sound').val())
+            $('.slider-sound').val(parseFloat($('.slider-sound').val()) + 10)
+            $('.sound').click()
+            break;
+        case "ArrowDown":
+            // console.log("Down")
+            $('.slider-sound').val(parseFloat($('.slider-sound').val()) - 10)
+            $('.sound').click()
+            break;
+        case " ":
+            // console.log("space")
+            $('.pp-button').click()
+            break;
+    }
+}
