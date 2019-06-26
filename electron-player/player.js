@@ -34,7 +34,7 @@ app = new Vue({
             videoplayer.src = file.path
             videoplayer.play()
             notification = new Notification(file.title)
-            setTimeout(notification.close.bind(notification), 1000);
+            setTimeout(notification.close.bind(notification), 2000);
             setInterval(main, 1000)
             contador = file.counter
             initalizeBySkip(contador)
@@ -90,7 +90,7 @@ dragDrop('body', function (files) {
             tmpDir: '/some/writeable/directory' //only required if you can't write to /tmp/ and you need to generate gifs
         });
 
-        tg.generateOneByPercent(50)
+        tg.generateOneByPercent(100 / 3)
             .then(() => {
                 counterGenerateThumb++
                 if (counterGenerateThumb === list_of_files.length) {
@@ -127,8 +127,8 @@ dragDrop('body', function (files) {
     })
     videoplayer.src = list_of_files[contador].path
     videoplayer.play()
-    notification = new Notification(list_of_files[contador].fullPath)
-    setTimeout(notification.close.bind(notification), 1000);
+    notification = new Notification(list_of_files[contador].name)
+    setTimeout(notification.close.bind(notification), 2000);
     setInterval(main, 1000)
 })
 
@@ -185,8 +185,8 @@ videoplayer.onended = function () {
     contador++
     videoplayer.src = list_of_files[contador].path
     videoplayer.play()
-    notification = new Notification(list_of_files[contador].fullPath)
-    setTimeout(notification.close.bind(notification), 1000);
+    notification = new Notification(list_of_files[contador].name)
+    setTimeout(notification.close.bind(notification), 2000);
 }
 
 element.next.click(function () {
@@ -196,8 +196,8 @@ element.next.click(function () {
     videoplayer.src = list_of_files[contador].path
     videoplayer.play()
     initalizeBySkip(contador)
-    notification = new Notification(list_of_files[contador].fullPath)
-    setTimeout(notification.close.bind(notification), 1000);
+    notification = new Notification(list_of_files[contador].name)
+    setTimeout(notification.close.bind(notification), 2000);
 
 })
 
@@ -209,8 +209,8 @@ element.previous.click(function () {
     videoplayer.src = list_of_files[contador].path
     videoplayer.play()
     initalizeBySkip(contador)
-    notification = new Notification(list_of_files[contador].fullPath)
-    setTimeout(notification.close.bind(notification), 1000);
+    notification = new Notification(list_of_files[contador].name)
+    setTimeout(notification.close.bind(notification), 2000);
 
 })
 

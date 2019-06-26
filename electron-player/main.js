@@ -2,6 +2,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 
+
 require('electron-reload')(__dirname);
 
 // Keep a global reference of the window object, if you don't, the window will
