@@ -111,6 +111,7 @@ dragDrop('body', function (files) {
                 file.time = moment(movie.relativeDuration() * 1000).format('mm:ss')
                 file.path = e.path
                 file.counter = i
+                file.isPinned = ((i + 1) <= skipContent.length)
                 playlist.push(JSON.parse(JSON.stringify(file)))
                 // Work with movie
                 // console.log('Duration:',
@@ -229,6 +230,7 @@ element.pinButton.click(function () {
             skipList[contador] = { [contador]: JSON.parse(JSON.stringify(fases)) }
             fases = { 'init_intro': 0, 'end_intro': 0, 'end_end': 0 }
             index = list_of_files[0].path.lastIndexOf('/')
+            app.files[contador].isPinned = true
             fs.writeFile(list_of_files[0].path.slice(0, index) + '/electron.skip', JSON.stringify(skipList), (err) => {
                 console.log(err)
             })

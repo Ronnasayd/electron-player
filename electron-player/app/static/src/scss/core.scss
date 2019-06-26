@@ -5,8 +5,22 @@ body{
     margin: 0;
     padding: 0;
 }
-.isActive{
+.isActive {
     background: rgb(66, 6, 6);
+}
+
+.expand-menu {
+    max-height: 399px !important;
+}
+
+.file-pin {
+    position: absolute;
+    top: 10%;
+    left: 90%;
+}
+
+.file-pin>i {
+    font-size: 10px;
 }
 .video-container{
     position: relative;

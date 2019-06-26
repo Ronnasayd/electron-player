@@ -19,6 +19,16 @@
         .expand-menu {
             max-height: 399px !important;
         }
+
+        .file-pin {
+            position: absolute;
+            top: 10%;
+            left: 90%;
+        }
+
+        .file-pin>i {
+            font-size: 10px;
+        }
     </style>
 </head>
 
@@ -67,7 +77,7 @@
         </div>
         <div class="video-container">
             <video id="player" width="768" height="432" autoplay>
-                <source src="http://localhost:8000/02.mp4" type="video/mp4">
+                <source src="" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
             <div class="skip-button">
@@ -99,6 +109,7 @@
                             </div>
                             <div class="file-title"><span>{{file.title}}</span></div>
                             <div class="file-time"><span>{{file.time}}</span></div>
+                            <div class="file-pin" v-if="file.isPinned"><i class="fas fa-thumbtack"></i></div>
                         </div>
                     </li>
 
