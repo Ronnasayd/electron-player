@@ -312,9 +312,11 @@ let skipSwitch = () => {
     switch (skipMode) {
         case "0":
             element.pinButton.fadeIn()
+            $('#side-menu-ul').removeClass('expand-menu')
             break;
         case "1":
             element.pinButton.fadeOut()
+            $('#side-menu-ul').addClass('expand-menu')
             if ((videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) || videoplayer.currentTime >= end_end) {
                 element.skipButton.fadeIn()
             }
@@ -324,6 +326,7 @@ let skipSwitch = () => {
             break;
         case "2":
             element.pinButton.fadeOut()
+            $('#side-menu-ul').addClass('expand-menu')
             if (videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) {
                 videoplayer.currentTime = end_intro
             }
