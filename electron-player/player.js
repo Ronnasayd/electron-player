@@ -1,10 +1,12 @@
+// Requires
 const VideoLib = require('node-video-lib');
 const fs = require('fs');
 const dragDrop = require('drag-drop')
 const ThumbnailGenerator = require('video-thumbnail-generator').default;
 
-var pp_list = ['play', 'pause'].reverse()
-var videoplayer = $('#player')[0]
+// Initial variables
+let pp_list = ['play', 'pause'].reverse()
+let videoplayer = element.player[0]
 let list_of_files = []
 let contador = 0
 let video_types = ['.mp4', '.mkv', '.avi']
@@ -20,56 +22,7 @@ let end_end = 0
 let playlist = []
 let counterGenerateThumb = 0
 
-$('#player, .video-controls').mouseenter(function () {
-    $('.video-controls').fadeIn()
-})
-$('#player').mouseleave(function () {
-    $('.video-controls').fadeOut()
-})
-
-
-$('.pp-button').click(function () {
-    if (pp_list[0] === 'play') {
-        $("#play-button").hide()
-        $("#pause-button").show()
-        videoplayer.play()
-        pp_list.reverse()
-    }
-    else {
-        $("#play-button").show()
-        $("#pause-button").hide()
-        videoplayer.pause()
-        pp_list.reverse()
-    }
-})
-
-$('.fullscrean').click(function () {
-    if (videoplayer.requestFullscreen) {
-        videoplayer.requestFullscreen();
-    } else if (videoplayer.mozRequestFullScreen) { /* Firefox */
-        videoplayer.mozRequestFullScreen();
-    } else if (videoplayer.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-        videoplayer.webkitRequestFullscreen();
-    } else if (videoplayer.msRequestFullscreen) { /* IE/Edge */
-        videoplayer.msRequestFullscreen();
-    }
-})
-
-$('.step-previous').click(function () {
-    videoplayer.currentTime = videoplayer.currentTime - 10
-    $('.slider').val(100 * videoplayer.currentTime / videoplayer.duration)
-})
-
-$('.step-next').click(function () {
-    videoplayer.currentTime = videoplayer.currentTime + 10
-    $('.slider').val(100 * videoplayer.currentTime / videoplayer.duration)
-})
-
-$('.slider').click(function () {
-    videoplayer.currentTime = videoplayer.duration * ($(this).val() / 100)
-})
-
-
+// Initialize vue app
 app = new Vue({
     el: ' #side-menu-ul',
     data: {
@@ -82,84 +35,15 @@ app = new Vue({
             videoplayer.play()
             notification = new Notification(file.title)
             setTimeout(notification.close.bind(notification), 1000);
-            setInterval(incrementSeconds, 1000)
+            setInterval(main, 1000)
             contador = file.counter
             initalizeBySkip(contador)
         }
     }
 })
-let addZero = (element) => {
-    if (element.length === 2) {
-        return element
-    }
-    else {
-        return "0" + element
-    }
-}
-
-let skipSwitch = () => {
-
-    switch (skipMode) {
-        case "0":
-            $('#pin-button').fadeIn()
-            break;
-        case "1":
-            $('#pin-button').fadeOut()
-            if ((videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) || videoplayer.currentTime >= end_end) {
-                $('.skip-button').fadeIn()
-            }
-            else {
-                $('.skip-button').fadeOut()
-            }
-            break;
-        case "2":
-            $('#pin-button').fadeOut()
-            if (videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) {
-                videoplayer.currentTime = end_intro
-            }
-            if (videoplayer.currentTime > end_intro && videoplayer.currentTime >= end_end) {
-                $('.next').click()
-            }
-            break;
-    }
-}
-
-let incrementSeconds = () => {
-    skipSwitch()
-    timerText = moment(videoplayer.currentTime * 1000).format('mm:ss')
-    totalTimeText = moment(videoplayer.duration * 1000).format('mm:ss')
-    $('.timer>span').text(timerText + ' / ' + totalTimeText)
-    $('.slider').val(100 * videoplayer.currentTime / videoplayer.duration)
 
 
-
-}
-
-let initalizeBySkip = (contador) => {
-    $('#side-menu-ul > li').removeClass('isActive')
-    $('#side-menu-ul > li:nth-child(' + (contador + 1).toString() + ')').addClass('isActive')
-
-
-
-    skipContent.filter((element, index) => {
-        if (index === contador) {
-            init_intro = element[index].init_intro
-            end_intro = element[index].end_intro
-            end_end = element[index].end_end
-            // console.log(init_intro, end_intro, end_end)
-            return element
-        }
-    })
-}
-
-let verifyVideoType = (file) => {
-    prod = 0
-    video_types.forEach((e, i) => {
-        prod += file.fullPath.includes(e)
-    })
-    return prod
-}
-
+// Event functions 
 dragDrop('body', function (files) {
     counterGenerateThumb = 0
     contador = 0
@@ -241,19 +125,60 @@ dragDrop('body', function (files) {
 
 
     })
-
-
-    // setTimeout(() => {
-    //     app.files = playlist
-    //     // console.log(playlist)
-    // }, 5000)
-
-
     videoplayer.src = list_of_files[contador].path
     videoplayer.play()
     notification = new Notification(list_of_files[contador].fullPath)
     setTimeout(notification.close.bind(notification), 1000);
-    setInterval(incrementSeconds, 1000)
+    setInterval(main, 1000)
+})
+
+element.playerAndVideoControls.mouseenter(function () {
+    element.videoControls.fadeIn()
+})
+
+element.player.mouseleave(function () {
+    element.videoControls.fadeOut()
+})
+
+element.playPauseButton.click(function () {
+    if (pp_list[0] === 'play') {
+        element.playButton.hide()
+        element.pauseButton.show()
+        videoplayer.play()
+        pp_list.reverse()
+    }
+    else {
+        element.playButton.show()
+        element.pauseButton.hide()
+        videoplayer.pause()
+        pp_list.reverse()
+    }
+})
+
+element.fullscrean.click(function () {
+    if (videoplayer.requestFullscreen) {
+        videoplayer.requestFullscreen();
+    } else if (videoplayer.mozRequestFullScreen) { /* Firefox */
+        videoplayer.mozRequestFullScreen();
+    } else if (videoplayer.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+        videoplayer.webkitRequestFullscreen();
+    } else if (videoplayer.msRequestFullscreen) { /* IE/Edge */
+        videoplayer.msRequestFullscreen();
+    }
+})
+
+element.stepPrevious.click(function () {
+    videoplayer.currentTime = videoplayer.currentTime - 10
+    element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
+})
+
+element.stepNext.click(function () {
+    videoplayer.currentTime = videoplayer.currentTime + 10
+    element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
+})
+
+element.slider.click(function () {
+    videoplayer.currentTime = videoplayer.duration * ($(this).val() / 100)
 })
 
 videoplayer.onended = function () {
@@ -264,7 +189,7 @@ videoplayer.onended = function () {
     setTimeout(notification.close.bind(notification), 1000);
 }
 
-$('.next').click(function () {
+element.next.click(function () {
     if (contador >= 0 && contador < list_of_files.length - 1) {
         contador++
     }
@@ -275,7 +200,8 @@ $('.next').click(function () {
     setTimeout(notification.close.bind(notification), 1000);
 
 })
-$('.previous').click(function () {
+
+element.previous.click(function () {
     if (contador >= 1 && contador <= list_of_files.length) {
         contador--
 
@@ -288,7 +214,7 @@ $('.previous').click(function () {
 
 })
 
-$('#pin-button').click(function () {
+element.pinButton.click(function () {
 
 
     switch (counterPinClick) {
@@ -313,27 +239,27 @@ $('#pin-button').click(function () {
     if (counterPinClick > 3) {
         counterPinClick = 1
     }
-    $('#pin-button>span').text(counterPinClick)
+    element.pinText.text(counterPinClick)
 
 
 })
 
-$('.skip-button').click(() => {
+element.skipButton.click(() => {
     if (videoplayer.currentTime <= end_intro) {
         videoplayer.currentTime = end_intro
     }
     if (videoplayer.currentTime > end_intro && videoplayer.currentTime >= end_end) {
-        $('.next').click()
+        element.next.click()
     }
 
 })
 
-$('#skip-menu').click(() => {
-    skipMode = $('#skip-menu').val()
+element.skipMenu.click(() => {
+    skipMode = element.skipMenu.val()
 })
 
-$('.sound').click(() => {
-    videoplayer.volume = parseFloat($('.slider-sound').val()) / 100
+element.sound.click(() => {
+    videoplayer.volume = parseFloat(element.sliderSound.val()) / 100
     if (videoplayer.volume > 1) {
         videoplayer.volume = 1
     }
@@ -342,9 +268,9 @@ $('.sound').click(() => {
     }
 })
 
-$('#play-list').click(() => {
+element.playList.click(() => {
     // console.log('list')
-    $('.side-menu').toggle()
+    element.sideMenu.toggle()
 })
 
 onkeydown = (event) => {
@@ -352,29 +278,95 @@ onkeydown = (event) => {
     switch (event.key) {
         case "ArrowRight":
             // console.log("right")
-            $('.step-next').click()
+            element.stepNext.click()
             break;
         case "ArrowLeft":
             // console.log("left")
-            $('.step-previous').click()
+            element.stepPrevious.click()
             break;
         case "Control":
             // console.log("control")
-            $('#pin-button').click()
+            element.pinButton.click()
             break;
         case "ArrowUp":
-            // console.log($('.slider-sound').val())
-            $('.slider-sound').val(parseFloat($('.slider-sound').val()) + 10)
-            $('.sound').click()
+            // console.log(element.sliderSound.val())
+            element.sliderSound.val(parseFloat(element.sliderSound.val()) + 10)
+            element.sound.click()
             break;
         case "ArrowDown":
             // console.log("Down")
-            $('.slider-sound').val(parseFloat($('.slider-sound').val()) - 10)
-            $('.sound').click()
+            element.sliderSound.val(parseFloat(element.sliderSound.val()) - 10)
+            element.sound.click()
             break;
         case " ":
             // console.log("space")
-            $('.pp-button').click()
+            element.playPauseButton.click()
             break;
     }
 }
+
+
+
+// Auxiliar functions
+let skipSwitch = () => {
+    switch (skipMode) {
+        case "0":
+            element.pinButton.fadeIn()
+            break;
+        case "1":
+            element.pinButton.fadeOut()
+            if ((videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) || videoplayer.currentTime >= end_end) {
+                element.skipButton.fadeIn()
+            }
+            else {
+                element.skipButton.fadeOut()
+            }
+            break;
+        case "2":
+            element.pinButton.fadeOut()
+            if (videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) {
+                videoplayer.currentTime = end_intro
+            }
+            if (videoplayer.currentTime > end_intro && videoplayer.currentTime >= end_end) {
+                element.next.click()
+            }
+            break;
+    }
+}
+
+let initalizeBySkip = (contador) => {
+    $('#side-menu-ul > li').removeClass('isActive')
+    $('#side-menu-ul > li:nth-child(' + (contador + 1).toString() + ')').addClass('isActive')
+
+
+
+    skipContent.filter((element, index) => {
+        if (index === contador) {
+            init_intro = element[index].init_intro
+            end_intro = element[index].end_intro
+            end_end = element[index].end_end
+            // console.log(init_intro, end_intro, end_end)
+            return element
+        }
+    })
+}
+
+let verifyVideoType = (file) => {
+    prod = 0
+    video_types.forEach((e, i) => {
+        prod += file.fullPath.includes(e)
+    })
+    return prod
+}
+
+// Main function
+let main = () => {
+    skipSwitch()
+    timerText = moment(videoplayer.currentTime * 1000).format('mm:ss')
+    totalTimeText = moment(videoplayer.duration * 1000).format('mm:ss')
+    element.timerText.text(timerText + ' / ' + totalTimeText)
+    element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
+}
+
+
+
