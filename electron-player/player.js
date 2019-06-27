@@ -186,6 +186,7 @@ videoplayer.onended = function () {
     contador++
     videoplayer.src = list_of_files[contador].path
     videoplayer.play()
+    initalizeBySkip(contador)
     notification = new Notification(list_of_files[contador].name)
     setTimeout(notification.close.bind(notification), 2000);
 }
