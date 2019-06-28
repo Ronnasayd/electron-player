@@ -72,12 +72,12 @@ const sassToCssMin = () => {
             browsers: ["last 100 versions"],
             cascade: false
         }))
-        .pipe(purgecss({ content: [html_files, not_node] }))
-        .on("error", function (err) {
-            console.log(err.message, err);
-            browserSync.notify(err.message, 3000); // Display error in the browser
-            this.emit("end"); // Prevent gulp from catching the error and exiting the watch process
-        })
+        // .pipe(purgecss({ content: [html_files, not_node] }))
+        // .on("error", function (err) {
+        //     console.log(err.message, err);
+        //     browserSync.notify(err.message, 3000); // Display error in the browser
+        //     this.emit("end"); // Prevent gulp from catching the error and exiting the watch process
+        // })
         .pipe(cleanCSS())
         .pipe(rename(function (file) {
             file.extname = ".min.css"

@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="static/libs/fontawesome/css/all.css">
-    <link rel="stylesheet" href="static/dist/css/core.min.css">
     <title>Electron-player</title>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <link rel="stylesheet" href="./static/dist/css/core.min.css">
 </head>
 
 <body>
@@ -57,7 +57,9 @@
         </div>
         <div class="video-container">
             <video id="player" width="768" height="432" autoplay>
-                <source src="http://localhost:8000/02.mp4" type="video/mp4">
+                <source
+                    src="https://r1---sn-uxaxpo4vcg-j28e.googlevideo.com/videoplayback?id=db6959231e53af4d&itag=22&source=blogger&pl=24&ei=90UVXYChD5-mzLUPgJi30As&susc=bl&mime=video/mp4&dur=1435.155&lmt=1560130789988843&ip=2607:5300:60:7317::&ipbits=0&expire=1561704055&sparams=dur,ei,expire,id,ip,ipbits,ipbypass,itag,lmt,mime,mip,mm,mn,ms,mv,pl,source,susc&signature=0953AEA2A6499C4717F4CD1C2963A40173736DDD.0726820DF557C30BFAECA88FA8DFF4AA00F1A8CF&key=cms1&redirect_counter=1&rm=sn-p5qks7e&req_id=aa2c6d11677836e2&cms_redirect=yes&ipbypass=yes&mip=170.84.145.171&mm=31&mn=sn-uxaxpo4vcg-j28e&ms=au&mt=1561675648&mv=m"
+                    type="video/mp4">
                 Your browser does not support the video tag.
             </video>
             <div class="skip-button">
@@ -89,6 +91,7 @@
                             </div>
                             <div class="file-title"><span>{{file.title}}</span></div>
                             <div class="file-time"><span>{{file.time}}</span></div>
+                            <div class="file-pin" v-if="file.isPinned"><i class="fas fa-thumbtack"></i></div>
                         </div>
                     </li>
 

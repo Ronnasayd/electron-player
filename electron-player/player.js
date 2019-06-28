@@ -7,6 +7,7 @@ const ThumbnailGenerator = require('video-thumbnail-generator').default;
 // Initial variables
 let pp_list = ['play', 'pause'].reverse()
 let videoplayer = element.player[0]
+let videocontainer = $('.video-player')[0]
 let list_of_files = []
 let contador = 0
 let video_types = ['.mp4', '.mkv', '.avi']
@@ -21,6 +22,8 @@ let end_intro = 0
 let end_end = 0
 let playlist = []
 let counterGenerateThumb = 0
+let mousetimer
+let isInFullscreen = false
 
 // Initialize vue app
 app = new Vue({
@@ -133,13 +136,16 @@ dragDrop('body', function (files) {
     setInterval(main, 1000)
 })
 
-element.playerAndVideoControls.mouseenter(function () {
+element.playerAndVideoControls.mousemove(function (e) {
+    clearTimeout(mousetimer);
     element.videoControls.fadeIn()
+    $('.video-player').css('cursor', 'default')
+    mousetimer = setTimeout(() => {
+        element.videoControls.fadeOut();
+        $('.video-player').css('cursor', 'none')
+    }, 3000)
 })
 
-element.player.mouseleave(function () {
-    element.videoControls.fadeOut()
-})
 
 element.playPauseButton.click(function () {
     if (pp_list[0] === 'play') {
@@ -157,15 +163,32 @@ element.playPauseButton.click(function () {
 })
 
 element.fullscrean.click(function () {
-    if (videoplayer.requestFullscreen) {
-        videoplayer.requestFullscreen();
-    } else if (videoplayer.mozRequestFullScreen) { /* Firefox */
-        videoplayer.mozRequestFullScreen();
-    } else if (videoplayer.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-        videoplayer.webkitRequestFullscreen();
-    } else if (videoplayer.msRequestFullscreen) { /* IE/Edge */
-        videoplayer.msRequestFullscreen();
+    if (isInFullscreen) {
+        isInFullscreen = !isInFullscreen
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { /* Firefox */
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { /* IE/Edge */
+            document.msExitFullscreen();
+        }
     }
+    else {
+        isInFullscreen = !isInFullscreen
+        if (videocontainer.requestFullscreen) {
+            videocontainer.requestFullscreen();
+        } else if (videocontainer.mozRequestFullScreen) { /* Firefox */
+            videocontainer.mozRequestFullScreen();
+        } else if (videocontainer.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+            videocontainer.webkitRequestFullscreen();
+        } else if (videocontainer.msRequestFullscreen) { /* IE/Edge */
+            videocontainer.msRequestFullscreen();
+        }
+
+    }
+
 })
 
 element.stepPrevious.click(function () {
