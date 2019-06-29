@@ -13,7 +13,7 @@ let contador = 0
 let video_types = ['.mp4', '.mkv', '.avi']
 let skipList = []
 let counterPinClick = 1
-let skipContent;
+let skipContent = [];
 let fases = { 'init_intro': 0, 'end_intro': 0, 'end_end': 0 }
 let skipMode = "0"
 let app
@@ -114,7 +114,13 @@ dragDrop('body', function (files) {
                 file.time = moment(movie.relativeDuration() * 1000).format('mm:ss')
                 file.path = e.path
                 file.counter = i
-                file.isPinned = ((i + 1) <= skipContent.length)
+                if (skipContent.length > 0) {
+                    file.isPinned = ((i + 1) <= skipContent.length)
+                }
+                else {
+                    file.isPinned = false
+                }
+
                 playlist.push(JSON.parse(JSON.stringify(file)))
                 // Work with movie
                 // console.log('Duration:',
