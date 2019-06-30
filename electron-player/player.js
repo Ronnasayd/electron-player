@@ -48,6 +48,7 @@ app = new Vue({
 
 // Event functions 
 dragDrop('body', function (files) {
+    // console.log(files)
     counterGenerateThumb = 0
     contador = 0
     playlist = []
