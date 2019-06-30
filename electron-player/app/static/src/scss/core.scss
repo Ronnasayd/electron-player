@@ -235,10 +235,10 @@ body{
 .slider{
     width: 99.5%;
     appearance: none;
-    border-radius: 5px;
-    height: 8px;
-    background: white;
+    height: 12px;
+    background: rgba(148, 148, 148, 0.4);
     outline: none;
+    cursor: pointer;
 }
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -257,8 +257,9 @@ body{
     appearance: none;
     border-radius: 5px;
     height: 8px;
-    background: white;
+    background: rgba(148, 148, 148, 0.4);
     outline: none;
+    cursor: pointer;
 }
 .slider-sound::-webkit-slider-thumb {
     -webkit-appearance: none;
