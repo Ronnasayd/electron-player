@@ -62,5 +62,18 @@ $(document).ready(function () {
     $('#pin-button').click(function () {
         console.log(videoplayer.currentTime)
     })
+
+    // $('.sound').mouseenter(function () {
+    //     console.log('enter')
+    //     $('.slider-sound').fadeIn()
+    // })
+    // $('.sound').mouseleave(function () {
+    //     console.log('leave')
+    //     $('.slider-sound').fadeOut()
+    // })
+
+    $('.initial-message').attr('data-display', 'false')
 });
+
+
 

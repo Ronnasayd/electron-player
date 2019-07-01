@@ -53,6 +53,7 @@ dragDrop('body', function (files) {
     contador = 0
     playlist = []
 
+    $('.initial-message').attr('data-display', 'false')
     skipFile = files.find((element) => {
         if (element.fullPath.includes('.skip')) {
             return element
