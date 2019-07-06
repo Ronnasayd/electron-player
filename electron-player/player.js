@@ -75,12 +75,25 @@ dragDrop('body', function (files) {
     // console.log(files)
     list_of_files = files.sort(function (a, b) {
         if (verifyVideoType(a) && verifyVideoType(b)) {
-            if (a.fullPath < b.fullPath) {
-                return -1
+            name_a = a.fullPath.slice(a.fullPath.lastIndexOf('/') + 1).replace('.mp4', '')
+            name_b = b.fullPath.slice(b.fullPath.lastIndexOf('/') + 1).replace('.mp4', '')
+            if (isNaN(name_a) || isNaN(name_b)) {
+                if (a.fullPath < b.fullPath) {
+                    return -1
+                }
+                else {
+                    return 1
+                }
             }
             else {
-                return 1
+                if (parseInt(name_a) < parseInt(name_b)) {
+                    return -1
+                }
+                else {
+                    return 1
+                }
             }
+
         }
 
     })
