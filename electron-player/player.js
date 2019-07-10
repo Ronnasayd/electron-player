@@ -215,11 +215,13 @@ element.fullscrean.click(function () {
 element.stepPrevious.click(function () {
     videoplayer.currentTime = videoplayer.currentTime - 10
     element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
+    element.slider.change()
 })
 
 element.stepNext.click(function () {
     videoplayer.currentTime = videoplayer.currentTime + 10
     element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
+    element.slider.change()
 })
 
 element.slider.on('input', function () {
@@ -320,7 +322,11 @@ element.sound.on('click', () => {
     }
 })
 
-$('.slider-sound').on('input', function () {
+element.sliderSound.on('input', function () {
+    $(this).css("background", "linear-gradient(to right, rgba(99,0,0,0.8) 0%, rgba(99,0,0,0.8) " + this.value + "%, rgba(148, 148, 148, 0.4) " + this.value + "%, rgba(148, 148, 148, 0.4) 100% )")
+})
+
+element.sliderSound.on('change', function () {
     $(this).css("background", "linear-gradient(to right, rgba(99,0,0,0.8) 0%, rgba(99,0,0,0.8) " + this.value + "%, rgba(148, 148, 148, 0.4) " + this.value + "%, rgba(148, 148, 148, 0.4) 100% )")
 })
 
@@ -348,11 +354,13 @@ onkeydown = (event) => {
             // console.log(element.sliderSound.val())
             element.sliderSound.val(parseFloat(element.sliderSound.val()) + 10)
             element.sound.click()
+            element.sliderSound.change()
             break;
         case "ArrowDown":
             // console.log("Down")
             element.sliderSound.val(parseFloat(element.sliderSound.val()) - 10)
             element.sound.click()
+            element.sliderSound.change()
             break;
         case " ":
             // console.log("space")
