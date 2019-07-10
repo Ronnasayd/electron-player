@@ -7,7 +7,12 @@ $(document).ready(function () {
         totalTimeText = moment(videoplayer.duration * 1000).format('mm:ss')
         $('.timer>span').text(timerText + ' / ' + totalTimeText)
         $('.slider').val(100 * videoplayer.currentTime / videoplayer.duration)
+        $('.slider').change()
+
     }, 1000)
+    $('.slider').on('change', function () {
+        $(this).css("background", "linear-gradient(to right, rgba(99,0,0,0.8) 0%, rgba(99,0,0,0.8) " + this.value + "%, rgba(148, 148, 148, 0.4) " + this.value + "%, rgba(148, 148, 148, 0.4) 100% )")
+    })
 
     $('#player, .video-controls').mouseenter(function () {
         $('.video-controls').fadeIn()
@@ -55,8 +60,13 @@ $(document).ready(function () {
         $('.slider').val(100 * videoplayer.currentTime / videoplayer.duration)
     })
 
-    $('.slider').click(function () {
-        videoplayer.currentTime = videoplayer.duration * ($(this).val() / 100)
+    $('.slider').on('input', function () {
+        videoplayer.currentTime = videoplayer.duration * ($(this).val() / 100);
+        $(this).css("background", "linear-gradient(to right, rgba(99,0,0,0.8) 0%, rgba(99,0,0,0.8) " + this.value + "%, rgba(148, 148, 148, 0.4) " + this.value + "%, rgba(148, 148, 148, 0.4) 100% )")
+    })
+
+    $('.slider-sound').on('input', function () {
+        $(this).css("background", "linear-gradient(to right, rgba(99,0,0,0.8) 0%, rgba(99,0,0,0.8) " + this.value + "%, rgba(148, 148, 148, 0.4) " + this.value + "%, rgba(148, 148, 148, 0.4) 100% )")
     })
 
     $('#pin-button').click(function () {
@@ -73,6 +83,8 @@ $(document).ready(function () {
     // })
 
     $('.initial-message').attr('data-display', 'false')
+
+
 });
 
 

@@ -222,8 +222,13 @@ element.stepNext.click(function () {
     element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
 })
 
-element.slider.click(function () {
+element.slider.on('input', function () {
     videoplayer.currentTime = videoplayer.duration * ($(this).val() / 100)
+    $(this).css("background", "linear-gradient(to right, rgba(99,0,0,0.8) 0%, rgba(99,0,0,0.8) " + this.value + "%, rgba(148, 148, 148, 0.4) " + this.value + "%, rgba(148, 148, 148, 0.4) 100% )")
+})
+
+element.slider.on('change', function () {
+    $(this).css("background", "linear-gradient(to right, rgba(99,0,0,0.8) 0%, rgba(99,0,0,0.8) " + this.value + "%, rgba(148, 148, 148, 0.4) " + this.value + "%, rgba(148, 148, 148, 0.4) 100% )")
 })
 
 videoplayer.onended = function () {
@@ -305,7 +310,7 @@ element.skipMenu.click(() => {
     skipMode = element.skipMenu.val()
 })
 
-element.sound.click(() => {
+element.sound.on('click', () => {
     videoplayer.volume = parseFloat(element.sliderSound.val()) / 100
     if (videoplayer.volume > 1) {
         videoplayer.volume = 1
@@ -313,6 +318,10 @@ element.sound.click(() => {
     if (videoplayer.volume < 0) {
         videoplayer.volume = 0
     }
+})
+
+$('.slider-sound').on('input', function () {
+    $(this).css("background", "linear-gradient(to right, rgba(99,0,0,0.8) 0%, rgba(99,0,0,0.8) " + this.value + "%, rgba(148, 148, 148, 0.4) " + this.value + "%, rgba(148, 148, 148, 0.4) 100% )")
 })
 
 element.playList.click(() => {
@@ -416,6 +425,7 @@ let main = () => {
     totalTimeText = moment(videoplayer.duration * 1000).format('mm:ss')
     element.timerText.text(timerText + ' / ' + totalTimeText)
     element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
+    element.slider.change()
 }
 
 

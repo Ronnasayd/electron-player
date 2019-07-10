@@ -37,47 +37,50 @@
         <h2>Drop Files or Folder Here</h2>
     </div>
     <div class="video-player">
-        <div class="video-controls">
-            <div class="slider-container">
-                <input type="range" min="1" max="100" value="0" class="slider">
-            </div>
-            <div class="pp-button">
-                <i id="play-button" class="fas fa-play"></i>
-                <i id="pause-button" class="fas fa-pause"></i>
-            </div>
-            <div class="fullscrean">
-                <i class="fas fa-compress"></i>
-            </div>
-            <div class="previous">
-                <i class="fas fa-step-backward"></i>
+        <div class="video-controls-container" width="768">
+            <div class="video-controls">
+                <div class="slider-container">
+                    <input type="range" min="1" max="100" value="0" class="slider">
+                </div>
+                <div class="pp-button">
+                    <i id="play-button" class="fas fa-play"></i>
+                    <i id="pause-button" class="fas fa-pause"></i>
+                </div>
+                <div class="fullscrean">
+                    <i class="fas fa-compress"></i>
+                </div>
+                <div class="previous">
+                    <i class="fas fa-step-backward"></i>
 
-            </div>
-            <div class="next">
-                <i class="fas fa-step-forward"></i>
+                </div>
+                <div class="next">
+                    <i class="fas fa-step-forward"></i>
 
-            </div>
-            <div class="step-previous">
-                <i class="fas fa-backward"></i>
+                </div>
+                <div class="step-previous">
+                    <i class="fas fa-backward"></i>
 
-            </div>
-            <div class="step-next">
-                <i class="fas fa-forward"></i>
-            </div>
-            <div class="timer">
-                <span>00:00 / 00:00</span>
-            </div>
-            <div class="skip-menu">
-                <select name="skip-menu-select" id="skip-menu">
-                    <option value="0">No-Skip</option>
-                    <option value="1">Manual-Skip</option>
-                    <option value="2">Auto-Skip</option>
-                </select>
-            </div>
-            <div class="sound">
-                <i class="fas fa-volume-up"></i>
-                <input type="range" min="0" max="100" value="100" class="slider-sound">
+                </div>
+                <div class="step-next">
+                    <i class="fas fa-forward"></i>
+                </div>
+                <div class="timer">
+                    <span>00:00 / 00:00</span>
+                </div>
+                <div class="skip-menu">
+                    <select name="skip-menu-select" id="skip-menu">
+                        <option value="0">No-Skip</option>
+                        <option value="1">Manual-Skip</option>
+                        <option value="2">Auto-Skip</option>
+                    </select>
+                </div>
+                <div class="sound">
+                    <i class="fas fa-volume-up"></i>
+                    <input type="range" min="0" max="100" value="100" class="slider-sound">
+                </div>
             </div>
         </div>
+
         <div class="video-container">
             <video id="player" width="768" height="432" autoplay>
                 <source src="" type="video/mp4">

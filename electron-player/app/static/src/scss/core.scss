@@ -48,8 +48,9 @@ body{
     }
 }
 .video-controls{
-    width: 768px;
+    width: 769px;
     height: 50px;
+    left: -1px;
     position: absolute;
     bottom: 0;
     background: rgba(0,0,0,0.75);
@@ -232,36 +233,39 @@ body{
 
 
 .slider-container{
-    width: 100%;
+    width: 768px;
     position: absolute;
     $top:-40%;
-    $left:0%;
+    $left:-2px;
     top: $top;
     left: $left;
-    transform: translate(-$left,-$top);
+    transform: translateY(-$top);
     cursor: pointer;
 
 }
 .slider{
+    background: linear-gradient(to right, rgba(148, 148, 148, 0.4) 0%, rgba(148, 148, 148, 0.4) 0%,rgba(148, 148, 148, 0.4) 50%, rgba(148, 148, 148, 0.4) 100% );
     display: block;
-    width: 99.5%;
+    width: 100%;
+    left: -1px;
     appearance: none;
     height: 12px;
-    background: rgba(148, 148, 148, 0.4);
+    transition: background 450ms ease-in;
+    // background: rgba(148, 148, 148, 0.4);
     outline: none;
     cursor: pointer;
     &:hover{
         height: 20px;
         position: relative;
-        top: -10px;
+        top: -11px;
     }
 }
 .slider::-webkit-slider-thumb {
     appearance: none;
-    width: 10px;
-    height: 10px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%; 
-    background: #990000;
+    background: #fff;
     cursor: pointer;
   }
   
@@ -273,7 +277,7 @@ body{
     appearance: none;
     border-radius: 5px;
     height: 8px;
-    background: rgba(148, 148, 148, 0.4);
+    background: linear-gradient(to right, rgba(99, 0, 0, 0.8) 0%, rgba(99, 0, 0, 0.8) 0%, rgba(99, 0, 0, 0.8) 50%, rgba(99, 0, 0, 0.8) 100% );
     outline: none;
     cursor: pointer;
 }
@@ -283,7 +287,7 @@ body{
     width: 10px;
     height: 10px;
     border-radius: 50%; 
-    background: #990000;
+    background: #fff;
     cursor: pointer;
   }
 
