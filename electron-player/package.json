@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "drag-drop": "^4.2.0",
-    "node-thumbnail": "^0.15.0",
     "node-video-lib": "^2.1.9",
     "video-thumbnail-generator": "^1.1.3"
   }
