@@ -29,6 +29,7 @@ const dist_css = "app/static/dist/css/"
 
 
 const html_files = "app/**/*.html"
+const js_files = "./**/*.js"
 
 
 
@@ -132,6 +133,7 @@ const reloadServer = () => {
     gulp.watch(src_css, { interval: 100, usePolling: true }, css_line);
     gulp.watch(images_folder, { interval: 100, usePolling: true }, image_line);
     gulp.watch(html_files, { interval: 100, usePolling: true }, browserReload);
+    gulp.watch(js_files, { interval: 100, usePolling: true }, browserReload);
 }
 
 const server = gulp.series(gulp.parallel(css_line, sass_line, image_line), reloadServer)
