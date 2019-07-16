@@ -1,5 +1,5 @@
 body{
-    background:#000000;
+    background:black;
     color: white;
     font-family: 'sans-serif';
     margin: 0;
@@ -413,6 +413,23 @@ font-weight: 800;
     z-index: 2147483647;
     box-shadow: 2px 2px 5px black;
     &[data-display='false']{
+        display: none;
+    }
+}
+
+#slider-output{
+    font-size: 12px;
+    position: absolute;
+    font-weight: 600;
+    top: -32px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    &[data-display=true]{
+        display: inline;
+    }
+    &[data-display=false]{
         display: none;
     }
 }

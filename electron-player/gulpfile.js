@@ -3,7 +3,6 @@ const browserSync = require("browser-sync").create();
 const sass = require("gulp-sass");
 const rename = require("gulp-rename");
 const autoprefixer = require("gulp-autoprefixer");
-const minifyjs = require("gulp-uglify");
 const sourcemaps = require("gulp-sourcemaps");
 const imagemin = require("gulp-imagemin");
 const cleanCSS = require("gulp-clean-css");
@@ -11,79 +10,27 @@ const cache = require("gulp-cached");
 const minimist = require("minimist");
 const concat = require("gulp-concat");
 const sassPartials = require('gulp-sass-partials-imported');
-const jshint = require('gulp-jshint');
-const babel = require('gulp-babel');
-const webpack = require('webpack-stream');
+const livereload = require('gulp-livereload');
+
+
 
 
 
 
 const src_scss = "app/static/src/scss/**/*.scss";
 const src_css = "app/static/src/css/**/*.css";
-const src_js = "app/static/src/js/**/*.js";
+
 
 const images_folder = "app/static/images/**/*.{png,jpeg,jpg,svg,ico}";
 
 const not_node = "!node_modules/"
 
-const dist_js = "app/static/dist/js/"
 const dist_css = "app/static/dist/css/"
 
 
 const html_files = "app/**/*.html"
 
 
-const jsHint = () => {
-    return gulp.src([src_js, not_node], { allowEmpty: true })
-        .pipe(cache("jsHint"))
-        .pipe(jshint({
-            esnext: true
-        }))
-        .pipe(jshint.reporter('default'));
-}
-
-const minifyJs = () => {
-    return gulp.src([src_js, not_node], { allowEmpty: true })
-        .pipe(cache("minifyJs"))
-        .pipe(sourcemaps.init())
-        .pipe(babel({
-            presets: ['@babel/env']
-        }))
-        .pipe(minifyjs()).on("error", function (err) {
-            console.log(err.message);
-            console.log(err.cause);
-            browserSync.notify(err.message, 3000); // Display error in the browser
-            this.emit("end"); // Prevent gulp from catching the error and exiting the watch process
-        })
-        .pipe(rename(function (file) {
-            file.extname = ".min.js"
-        }))
-        .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest(dist_js))
-}
-
-const webPackJs = () => {
-    let basename;
-    return gulp.src([src_js, not_node], { allowEmpty: true })
-        .pipe(cache("webpackJs"))
-        .pipe(babel({
-            presets: ['@babel/env']
-        }))
-        .pipe(rename(function (file) {
-            basename = file.basename
-            console.log(basename)
-        }))
-        .pipe(webpack({
-            mode: "production",
-            devtool: 'source-map',
-            output: {
-                filename: () => {
-                    return basename + '.min.js'
-                }
-            }
-        }))
-        .pipe(gulp.dest(dist_js))
-}
 
 
 const sassToCssMin = () => {
@@ -111,7 +58,6 @@ const sassToCssMin = () => {
         }))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest(dist_css))
-        .pipe(browserSync.stream())
 }
 
 const minifyCss = () => {
@@ -130,7 +76,6 @@ const minifyCss = () => {
         }))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest(dist_css))
-        .pipe(browserSync.stream())
 }
 
 
@@ -152,7 +97,7 @@ const concatFiles = () => {
 
 
 const browserReload = (done) => {
-    browserSync.reload();
+    livereload();
     done();
 }
 
@@ -174,31 +119,22 @@ const minifyImages = () => {
 }
 
 
-const js_line = gulp.series(jsHint, minifyJs); // Use this line if you want minify the javascript
-// const js_line = gulp.series(jsHint, webPackJs); // Use this line if  you want webpack javascript
-
-const sass_line = gulp.series(sassToCssMin)
-const css_line = gulp.series(minifyCss);
+const sass_line = gulp.series(sassToCssMin, browserReload)
+const css_line = gulp.series(minifyCss, browserReload);
 const image_line = gulp.series(minifyImages);
 
 
 
-const browserSyncServer = () => {
-    browserSync.init({
-        open: false,
-        server: {
-            baseDir: "./app"
-        }
-    });
+const reloadServer = () => {
+    livereload.listen();
 
     gulp.watch(src_scss, { interval: 100, usePolling: true }, sass_line);
     gulp.watch(src_css, { interval: 100, usePolling: true }, css_line);
-    gulp.watch(src_js, { interval: 100, usePolling: true }, gulp.series(js_line, browserReload));
     gulp.watch(images_folder, { interval: 100, usePolling: true }, image_line);
-    gulp.watch(html_files, { interval: 100, usePolling: true }, gulp.series(browserReload));
+    gulp.watch(html_files, { interval: 100, usePolling: true }, browserReload);
 }
 
-const server = gulp.series(gulp.parallel(js_line, css_line, sass_line, image_line), browserSyncServer)
+const server = gulp.series(gulp.parallel(css_line, sass_line, image_line), reloadServer)
 
 exports.concatfiles = concatFiles
 exports.default = server
