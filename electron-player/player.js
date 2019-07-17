@@ -3,6 +3,8 @@ const VideoLib = require('node-video-lib');
 const fs = require('fs');
 const dragDrop = require('drag-drop')
 const ThumbnailGenerator = require('video-thumbnail-generator').default;
+const moment = require('moment')
+
 
 // Initial variables
 let pp_list = ['play', 'pause'].reverse()
@@ -97,21 +99,21 @@ dragDrop('body', function (files) {
         }
 
     })
+    index = list_of_files[0].path.lastIndexOf('/')
+
     // console.log(list_of_files)
     list_of_files.forEach((e, i) => {
         file = {}
         index = list_of_files[0].path.lastIndexOf('/')
         list_of_files[0].path.slice(0, index)
-        const tg = new ThumbnailGenerator({
-            sourcePath: e.path,
-            thumbnailPath: list_of_files[0].path.slice(0, index) + '/.thumb',
-            tmpDir: '/some/writeable/directory' //only required if you can't write to /tmp/ and you need to generate gifs
-        });
 
-        tg.generateOneByPercent(100 / 3)
-            .then(() => {
-                counterGenerateThumb++
-                if (counterGenerateThumb === list_of_files.length) {
+
+        fs.readdir(list_of_files[0].path.slice(0, index) + '/.thumb', (err, files) => {
+            try {
+                if (files.length < list_of_files.length) {
+                    generateThumbs(e)
+                }
+                else {
                     app.files = playlist
                     $('#side-menu-ul > li').removeClass('isActive')
                     setTimeout(() => {
@@ -119,7 +121,14 @@ dragDrop('body', function (files) {
                     }, 500)
                     // console.log(app.files)
                 }
-            });
+
+            }
+            catch (err) {
+                generateThumbs(e)
+            }
+
+        })
+
 
         fs.open(e.path, 'r', function (err, fd) {
             try {
@@ -438,14 +447,36 @@ let verifyVideoType = (file) => {
     return prod
 }
 
+let generateThumbs = (e) => {
+    const tg = new ThumbnailGenerator({
+        sourcePath: e.path,
+        thumbnailPath: list_of_files[0].path.slice(0, index) + '/.thumb',
+        tmpDir: '/some/writeable/directory' //only required if you can't write to /tmp/ and you need to generate gifs
+    });
+    tg.generateOneByPercent(100 / 3)
+        .then(() => {
+            counterGenerateThumb++
+            if (counterGenerateThumb === list_of_files.length) {
+                app.files = playlist
+                $('#side-menu-ul > li').removeClass('isActive')
+                setTimeout(() => {
+                    $('#side-menu-ul > li:nth-child(1)').addClass('isActive')
+                }, 500)
+                // console.log(app.files)
+            }
+        });
+}
+
 // Main function
 let main = () => {
     skipSwitch()
     timerText = moment(videoplayer.currentTime * 1000).format('mm:ss')
-    totalTimeText = moment(videoplayer.duration * 1000).format('mm:ss')
-    element.timerText.text(timerText + ' / ' + totalTimeText)
-    element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
-    element.slider.change()
+    if (!isNaN(videoplayer.duration)) {
+        totalTimeText = moment(videoplayer.duration * 1000).format('mm:ss')
+        element.timerText.text(timerText + ' / ' + totalTimeText)
+        element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
+        element.slider.change()
+    }
 }
 
 

@@ -5,24 +5,39 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "gulp": "gulp"
+    "gulp": "gulp",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/Ronnasayd/electron-player",
   "keywords": [
     "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "player",
+    "video"
   ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
+  "build": {
+    "appId": "yourappid",
+    "linux": {
+      "target": [
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "NSIS",
+      "icon": "icons/icon.ico"
+    }
+  },
+  "author": {
+    "name": "Ronnasayd Machado",
+    "email": "ronnasayd@hotmail.com"
+  },
+  "license": "Mit",
   "devDependencies": {
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
     "browser-sync": "^2.26.7",
     "electron": "^5.0.2",
-    "electron-reload": "^1.4.0",
+    "electron-builder": "^21.0.15",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^6.1.0",
     "gulp-cached": "^1.1.1",
@@ -40,6 +55,8 @@
   },
   "dependencies": {
     "drag-drop": "^4.2.0",
+    "jquery": "^3.4.1",
+    "moment": "^2.24.0",
     "node-video-lib": "^2.1.9",
     "video-thumbnail-generator": "^1.1.3"
   }
