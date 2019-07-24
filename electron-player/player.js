@@ -1,86 +1,115 @@
 // Requires
 const VideoLib = require('node-video-lib');
-const fs = require('fs');
+const fileSystem = require('fs');
 const dragDrop = require('drag-drop')
 const ThumbnailGenerator = require('video-thumbnail-generator').default;
 const moment = require('moment')
 
 
 // Initial variables
-let pp_list = ['play', 'pause'].reverse()
-let videoplayer = element.player[0]
-let videocontainer = $('.video-player')[0]
-let list_of_files = []
-let contador = 0
-let video_types = ['.mp4', '.mkv', '.avi']
-let skipList = []
-let counterPinClick = 1
-let skipContent = [];
-let fases = { 'init_intro': 0, 'end_intro': 0, 'end_end': 0 }
+const firstElement = 0
+let togglePlayAndPause = ['play', 'pause'].reverse()
+let videoPlayer = element.videoPlayer
+let videoPlayerContainer = element.videoPlayerContainer
+let videoList = []
+let currentVideo = 0
+let supportedVideoTypes = ['.mp4', '.mkv', '.avi', '.webm']
+let skipPinCounter = 1
+let skipList = [];
+let skipStages = { 'startOfOpening': 0, 'endOfOpening': 0, 'startOfCredits': 0 }
 let skipMode = "0"
-let app
-let init_intro = 0
-let end_intro = 0
-let end_end = 0
-let playlist = []
-let counterGenerateThumb = 0
-let mousetimer
+let vueApplication
+let startOfOpening = 0
+let endOfOpening = 0
+let startOfCredits = 0
+let videoPlayList = []
+let counterGenerateThumbmail = 0
+let mouseIOTimerController;
 let isInFullscreen = false
 
-// Initialize vue app
-app = new Vue({
+// Initialize vue vueApplication
+vueApplication = new Vue({
     el: ' #side-menu-ul',
     data: {
-        files: playlist
+        files: videoPlayList
     },
     methods: {
         jump: (file) => {
             // console.log(file.path)
-            videoplayer.src = file.path
-            videoplayer.play()
+            videoPlayer.src = file.path
+            videoPlayer.play()
             notification = new Notification(file.title)
             setTimeout(notification.close.bind(notification), 2000);
             setInterval(main, 1000)
-            contador = file.counter
-            initalizeBySkip(contador)
+            currentVideo = file.counter
+            initializeVariablesByCurrentVideo(currentVideo)
         }
     }
 })
 
+resetVariables = () => {
+    counterGenerateThumbmail = 0;
+    currentVideo = 0;
+    videoPlayList = [];
+}
 
-// Event functions 
-dragDrop('body', function (files) {
-    // console.log(files)
-    counterGenerateThumb = 0
-    contador = 0
-    playlist = []
-
-    $('.initial-message').attr('data-display', 'false')
-    skipFile = files.find((element) => {
-        if (element.fullPath.includes('.skip')) {
-            return element
+getSkipFile = (files) => {
+    return files.find((file) => {
+        if (file.fullPath.includes('.skip')) {
+            return file
         }
     })
-    // console.log(skipFile)
+}
+
+removePreLoadingBanner = () => {
+    element.preLoadingBanner.attr('data-display', 'false')
+}
+
+isSkipFileExists = (skipFile) => {
     if (skipFile === undefined) {
-        // console.log('arquivo nao existe')
+        return false
     }
     else {
-        // console.log('arquivo existe')
-        skipContent = JSON.parse(fs.readFileSync(skipFile.path, 'utf8'))
-        initalizeBySkip(contador)
-        skipList = skipContent
+        return true
     }
-    files = files.filter((element) => {
-        return verifyVideoType(element)
+}
+
+getSkipList = (files) => {
+    skipFile = getSkipFile(files)
+    if (isSkipFileExists(skipFile)) {
+        return JSON.parse(fileSystem.readFileSync(skipFile.path, 'utf8'))
+    }
+    else {
+        return {}
+    }
+
+}
+
+renderActiveCurrentVideo = (currentVideo) => {
+    $('#side-menu-ul > li').removeClass('isActive')
+    setTimeout(() => {
+        $('#side-menu-ul > li:nth-child(' + (currentVideo + 1).toString() + ')').addClass('isActive')
+    }, 500)
+}
+
+getVideoFiles = (files) => {
+    return files.filter((element) => {
+        return videoIsSupported(element)
     })
-    // console.log(files)
-    list_of_files = files.sort(function (a, b) {
-        if (verifyVideoType(a) && verifyVideoType(b)) {
-            name_a = a.fullPath.slice(a.fullPath.lastIndexOf('/') + 1).replace('.mp4', '')
-            name_b = b.fullPath.slice(b.fullPath.lastIndexOf('/') + 1).replace('.mp4', '')
-            if (isNaN(name_a) || isNaN(name_b)) {
-                if (a.fullPath < b.fullPath) {
+}
+
+
+getNameOfVideo = (video) => {
+    return video.fullPath.slice(video.fullPath.lastIndexOf('/') + 1).replace('.mp4', '')
+}
+
+sortVideoList = (files) => {
+    return files.sort(function (firstVideo, secondVideo) {
+        if (videoIsSupported(firstVideo) && videoIsSupported(secondVideo)) {
+            nameOfFirstVideo = getNameOfVideo(firstVideo)
+            nameOfSecondVideo = getNameOfVideo(secondVideo)
+            if (isNaN(nameOfFirstVideo) || isNaN(nameOfSecondVideo)) {
+                if (firstVideo.fullPath < secondVideo.fullPath) {
                     return -1
                 }
                 else {
@@ -88,7 +117,7 @@ dragDrop('body', function (files) {
                 }
             }
             else {
-                if (parseInt(name_a) < parseInt(name_b)) {
+                if (parseInt(nameOfFirstVideo) < parseInt(nameOfSecondVideo)) {
                     return -1
                 }
                 else {
@@ -99,27 +128,34 @@ dragDrop('body', function (files) {
         }
 
     })
-    index = list_of_files[0].path.lastIndexOf('/')
+}
 
-    // console.log(list_of_files)
-    list_of_files.forEach((e, i) => {
+// Event functions 
+dragDrop('body', function (files) {
+    resetVariables()
+    removePreLoadingBanner()
+    skipList = getSkipList(files)
+    initializeVariablesByCurrentVideo(currentVideo)
+    files = getVideoFiles(files)
+    videoList = sortVideoList(files)
+    console.log(videoList)
+    index = videoList[firstElement].path.lastIndexOf('/')
+
+    // console.log(videoList)
+    videoList.forEach((e, i) => {
         file = {}
-        index = list_of_files[0].path.lastIndexOf('/')
-        list_of_files[0].path.slice(0, index)
+        index = videoList[firstElement].path.lastIndexOf('/')
+        videoList[firstElement].path.slice(0, index)
 
 
-        fs.readdir(list_of_files[0].path.slice(0, index) + '/.thumb', (err, files) => {
+        fileSystem.readdir(videoList[firstElement].path.slice(0, index) + '/.thumb', (err, files) => {
             try {
-                if (files.length < list_of_files.length) {
+                if (files.length < videoList.length) {
                     generateThumbs(e)
                 }
                 else {
-                    app.files = playlist
-                    $('#side-menu-ul > li').removeClass('isActive')
-                    setTimeout(() => {
-                        $('#side-menu-ul > li:nth-child(1)').addClass('isActive')
-                    }, 500)
-                    // console.log(app.files)
+                    vueApplication.files = videoPlayList
+                    renderActiveCurrentVideo(0)
                 }
 
             }
@@ -130,22 +166,22 @@ dragDrop('body', function (files) {
         })
 
 
-        fs.open(e.path, 'r', function (err, fd) {
+        fileSystem.open(e.path, 'r', function (err, fd) {
             try {
                 let movie = VideoLib.MovieParser.parse(fd);
-                file.img = list_of_files[0].path.slice(0, index) + '/.thumb/' + e.name.replace(".mp4", "") + '-thumbnail-320x240-0001.png'
+                file.img = videoList[firstElement].path.slice(0, index) + '/.thumb/' + e.name.replace(".mp4", "") + '-thumbnail-320x240-0001.png'
                 file.title = e.name
                 file.time = moment(movie.relativeDuration() * 1000).format('mm:ss')
                 file.path = e.path
                 file.counter = i
-                if (skipContent.length > 0) {
-                    file.isPinned = ((i + 1) <= skipContent.length)
+                if (skipList.length > 0) {
+                    file.isPinned = ((i + 1) <= skipList.length)
                 }
                 else {
                     file.isPinned = false
                 }
 
-                playlist.push(JSON.parse(JSON.stringify(file)))
+                videoPlayList.push(JSON.parse(JSON.stringify(file)))
                 // Work with movie
                 // console.log('Duration:',
                 //     moment(movie.relativeDuration() * 1000).format('mm:ss')
@@ -153,24 +189,24 @@ dragDrop('body', function (files) {
             } catch (ex) {
                 console.error('Error:', ex);
             } finally {
-                fs.closeSync(fd);
+                fileSystem.closeSync(fd);
             }
         });
 
 
     })
-    videoplayer.src = list_of_files[contador].path
-    videoplayer.play()
-    notification = new Notification(list_of_files[contador].name)
+    videoPlayer.src = videoList[currentVideo].path
+    videoPlayer.play()
+    notification = new Notification(videoList[currentVideo].name)
     setTimeout(notification.close.bind(notification), 2000);
     setInterval(main, 1000)
 })
 
 element.playerAndVideoControls.mousemove(function (e) {
-    clearTimeout(mousetimer);
+    clearTimeout(mouseIOTimerController);
     element.videoControls.fadeIn()
     $('.video-player').css('cursor', 'default')
-    mousetimer = setTimeout(() => {
+    mouseIOTimerController = setTimeout(() => {
         element.videoControls.fadeOut();
         $('.video-player').css('cursor', 'none')
     }, 3000)
@@ -178,17 +214,17 @@ element.playerAndVideoControls.mousemove(function (e) {
 
 
 element.playPauseButton.click(function () {
-    if (pp_list[0] === 'play') {
+    if (togglePlayAndPause[firstElement] === 'play') {
         element.playButton.hide()
         element.pauseButton.show()
-        videoplayer.play()
-        pp_list.reverse()
+        videoPlayer.play()
+        togglePlayAndPause.reverse()
     }
     else {
         element.playButton.show()
         element.pauseButton.hide()
-        videoplayer.pause()
-        pp_list.reverse()
+        videoPlayer.pause()
+        togglePlayAndPause.reverse()
     }
 })
 
@@ -207,14 +243,14 @@ element.fullscrean.click(function () {
     }
     else {
         isInFullscreen = !isInFullscreen
-        if (videocontainer.requestFullscreen) {
-            videocontainer.requestFullscreen();
-        } else if (videocontainer.mozRequestFullScreen) { /* Firefox */
-            videocontainer.mozRequestFullScreen();
-        } else if (videocontainer.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-            videocontainer.webkitRequestFullscreen();
-        } else if (videocontainer.msRequestFullscreen) { /* IE/Edge */
-            videocontainer.msRequestFullscreen();
+        if (videoPlayerContainer.requestFullscreen) {
+            videoPlayerContainer.requestFullscreen();
+        } else if (videoPlayerContainer.mozRequestFullScreen) { /* Firefox */
+            videoPlayerContainer.mozRequestFullScreen();
+        } else if (videoPlayerContainer.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+            videoPlayerContainer.webkitRequestFullscreen();
+        } else if (videoPlayerContainer.msRequestFullscreen) { /* IE/Edge */
+            videoPlayerContainer.msRequestFullscreen();
         }
 
     }
@@ -222,19 +258,19 @@ element.fullscrean.click(function () {
 })
 
 element.stepPrevious.click(function () {
-    videoplayer.currentTime = videoplayer.currentTime - 10
-    element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
+    videoPlayer.currentTime = videoPlayer.currentTime - 10
+    element.slider.val(100 * videoPlayer.currentTime / videoPlayer.duration)
     element.slider.change()
 })
 
 element.stepNext.click(function () {
-    videoplayer.currentTime = videoplayer.currentTime + 10
-    element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
+    videoPlayer.currentTime = videoPlayer.currentTime + 10
+    element.slider.val(100 * videoPlayer.currentTime / videoPlayer.duration)
     element.slider.change()
 })
 
 element.slider.on('input', function () {
-    videoplayer.currentTime = videoplayer.duration * ($(this).val() / 100)
+    videoPlayer.currentTime = videoPlayer.duration * ($(this).val() / 100)
     $(this).css("background", "linear-gradient(to right, rgba(99,0,0,0.8) 0%, rgba(99,0,0,0.8) " + this.value + "%, rgba(148, 148, 148, 0.4) " + this.value + "%, rgba(148, 148, 148, 0.4) 100% )")
 })
 
@@ -242,36 +278,36 @@ element.slider.on('change', function () {
     $(this).css("background", "linear-gradient(to right, rgba(99,0,0,0.8) 0%, rgba(99,0,0,0.8) " + this.value + "%, rgba(148, 148, 148, 0.4) " + this.value + "%, rgba(148, 148, 148, 0.4) 100% )")
 })
 
-videoplayer.onended = function () {
-    contador++
-    videoplayer.src = list_of_files[contador].path
-    videoplayer.play()
-    initalizeBySkip(contador)
-    notification = new Notification(list_of_files[contador].name)
+videoPlayer.onended = function () {
+    currentVideo++
+    videoPlayer.src = videoList[currentVideo].path
+    videoPlayer.play()
+    initializeVariablesByCurrentVideo(currentVideo)
+    notification = new Notification(videoList[currentVideo].name)
     setTimeout(notification.close.bind(notification), 2000);
 }
 
 element.next.click(function () {
-    if (contador >= 0 && contador < list_of_files.length - 1) {
-        contador++
+    if (currentVideo >= 0 && currentVideo < videoList.length - 1) {
+        currentVideo++
     }
-    videoplayer.src = list_of_files[contador].path
-    videoplayer.play()
-    initalizeBySkip(contador)
-    notification = new Notification(list_of_files[contador].name)
+    videoPlayer.src = videoList[currentVideo].path
+    videoPlayer.play()
+    initializeVariablesByCurrentVideo(currentVideo)
+    notification = new Notification(videoList[currentVideo].name)
     setTimeout(notification.close.bind(notification), 2000);
 
 })
 
 element.previous.click(function () {
-    if (contador >= 1 && contador <= list_of_files.length) {
-        contador--
+    if (currentVideo >= 1 && currentVideo <= videoList.length) {
+        currentVideo--
 
     }
-    videoplayer.src = list_of_files[contador].path
-    videoplayer.play()
-    initalizeBySkip(contador)
-    notification = new Notification(list_of_files[contador].name)
+    videoPlayer.src = videoList[currentVideo].path
+    videoPlayer.play()
+    initializeVariablesByCurrentVideo(currentVideo)
+    notification = new Notification(videoList[currentVideo].name)
     setTimeout(notification.close.bind(notification), 2000);
 
 })
@@ -279,39 +315,39 @@ element.previous.click(function () {
 element.pinButton.click(function () {
 
 
-    switch (counterPinClick) {
+    switch (skipPinCounter) {
         case 1:
-            fases.init_intro = videoplayer.currentTime
+            skipStages.startOfOpening = videoPlayer.currentTime
             break;
         case 2:
-            fases.end_intro = videoplayer.currentTime
+            skipStages.endOfOpening = videoPlayer.currentTime
             break;
         case 3:
-            fases.end_end = videoplayer.currentTime
-            skipList[contador] = { [contador]: JSON.parse(JSON.stringify(fases)) }
-            fases = { 'init_intro': 0, 'end_intro': 0, 'end_end': 0 }
-            index = list_of_files[0].path.lastIndexOf('/')
-            app.files[contador].isPinned = true
-            fs.writeFile(list_of_files[0].path.slice(0, index) + '/electron.skip', JSON.stringify(skipList), (err) => {
+            skipStages.startOfCredits = videoPlayer.currentTime
+            skipList[currentVideo] = { [currentVideo]: JSON.parse(JSON.stringify(skipStages)) }
+            skipStages = { 'startOfOpening': 0, 'endOfOpening': 0, 'startOfCredits': 0 }
+            index = videoList[firstElement].path.lastIndexOf('/')
+            vueApplication.files[currentVideo].isPinned = true
+            fileSystem.writeFile(videoList[firstElement].path.slice(0, index) + '/electron.skip', JSON.stringify(skipList), (err) => {
                 console.log(err)
             })
             break;
     }
 
-    counterPinClick++
-    if (counterPinClick > 3) {
-        counterPinClick = 1
+    skipPinCounter++
+    if (skipPinCounter > 3) {
+        skipPinCounter = 1
     }
-    element.pinText.text(counterPinClick)
+    element.pinText.text(skipPinCounter)
 
 
 })
 
 element.skipButton.click(() => {
-    if (videoplayer.currentTime <= end_intro) {
-        videoplayer.currentTime = end_intro
+    if (videoPlayer.currentTime <= endOfOpening) {
+        videoPlayer.currentTime = endOfOpening
     }
-    if (videoplayer.currentTime > end_intro && videoplayer.currentTime >= end_end) {
+    if (videoPlayer.currentTime > endOfOpening && videoPlayer.currentTime >= startOfCredits) {
         element.next.click()
     }
 
@@ -322,12 +358,12 @@ element.skipMenu.click(() => {
 })
 
 element.sound.on('click', () => {
-    videoplayer.volume = parseFloat(element.sliderSound.val()) / 100
-    if (videoplayer.volume > 1) {
-        videoplayer.volume = 1
+    videoPlayer.volume = parseFloat(element.sliderSound.val()) / 100
+    if (videoPlayer.volume > 1) {
+        videoPlayer.volume = 1
     }
-    if (videoplayer.volume < 0) {
-        videoplayer.volume = 0
+    if (videoPlayer.volume < 0) {
+        videoPlayer.volume = 0
     }
 })
 
@@ -381,9 +417,9 @@ onkeydown = (event) => {
 
 $('.slider').mousemove((e) => {
     $('#slider-output').attr('data-display', 'true');
-    let slidertime = moment().startOf('day').seconds((e.offsetX / e.target.offsetWidth) * videoplayer.duration).format('HH:mm:ss');
+    let slidertime = moment().startOf('day').seconds((e.offsetX / e.target.offsetWidth) * videoPlayer.duration).format('HH:mm:ss');
     $('#slider-output').val(slidertime);
-    $('#slider-output').css('left', e.offsetX - $('#slider-output')[0].offsetWidth / 2);
+    $('#slider-output').css('left', e.offsetX - $('#slider-output')[firstElement].offsetWidth / 2);
 });
 
 $('.slider').mouseout((e) => {
@@ -402,7 +438,7 @@ let skipSwitch = () => {
         case "1":
             element.pinButton.fadeOut()
             $('#side-menu-ul').addClass('expand-menu')
-            if ((videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) || videoplayer.currentTime >= end_end) {
+            if ((videoPlayer.currentTime >= startOfOpening && videoPlayer.currentTime <= endOfOpening) || videoPlayer.currentTime >= startOfCredits) {
                 element.skipButton.fadeIn()
             }
             else {
@@ -412,57 +448,50 @@ let skipSwitch = () => {
         case "2":
             element.pinButton.fadeOut()
             $('#side-menu-ul').addClass('expand-menu')
-            if (videoplayer.currentTime >= init_intro && videoplayer.currentTime <= end_intro) {
-                videoplayer.currentTime = end_intro
+            if (videoPlayer.currentTime >= startOfOpening && videoPlayer.currentTime <= endOfOpening) {
+                videoPlayer.currentTime = endOfOpening
             }
-            if (videoplayer.currentTime > end_intro && videoplayer.currentTime >= end_end) {
+            if (videoPlayer.currentTime > endOfOpening && videoPlayer.currentTime >= startOfCredits) {
                 element.next.click()
             }
             break;
     }
 }
 
-let initalizeBySkip = (contador) => {
-    $('#side-menu-ul > li').removeClass('isActive')
-    $('#side-menu-ul > li:nth-child(' + (contador + 1).toString() + ')').addClass('isActive')
 
 
-
-    skipContent.filter((element, index) => {
-        if (index === contador) {
-            init_intro = element[index].init_intro
-            end_intro = element[index].end_intro
-            end_end = element[index].end_end
-            // console.log(init_intro, end_intro, end_end)
+let initializeVariablesByCurrentVideo = (currentVideo) => {
+    renderActiveCurrentVideo(currentVideo)
+    skipList.filter((element, index) => {
+        if (index === currentVideo) {
+            startOfOpening = element[index].startOfOpening
+            endOfOpening = element[index].endOfOpening
+            startOfCredits = element[index].startOfCredits
             return element
         }
     })
 }
 
-let verifyVideoType = (file) => {
-    prod = 0
-    video_types.forEach((e, i) => {
-        prod += file.fullPath.includes(e)
+let videoIsSupported = (file) => {
+    summation = 0
+    supportedVideoTypes.forEach((element, index) => {
+        summation += file.fullPath.includes(element)
     })
-    return prod
+    return Boolean(summation)
 }
 
 let generateThumbs = (e) => {
     const tg = new ThumbnailGenerator({
         sourcePath: e.path,
-        thumbnailPath: list_of_files[0].path.slice(0, index) + '/.thumb',
+        thumbnailPath: videoList[firstElement].path.slice(0, index) + '/.thumb',
         tmpDir: '/some/writeable/directory' //only required if you can't write to /tmp/ and you need to generate gifs
     });
     tg.generateOneByPercent(100 / 3)
         .then(() => {
-            counterGenerateThumb++
-            if (counterGenerateThumb === list_of_files.length) {
-                app.files = playlist
-                $('#side-menu-ul > li').removeClass('isActive')
-                setTimeout(() => {
-                    $('#side-menu-ul > li:nth-child(1)').addClass('isActive')
-                }, 500)
-                // console.log(app.files)
+            counterGenerateThumbmail++
+            if (counterGenerateThumbmail === videoList.length) {
+                vueApplication.files = videoPlayList
+                renderActiveCurrentVideo(0)
             }
         });
 }
@@ -470,11 +499,11 @@ let generateThumbs = (e) => {
 // Main function
 let main = () => {
     skipSwitch()
-    timerText = moment(videoplayer.currentTime * 1000).format('mm:ss')
-    if (!isNaN(videoplayer.duration)) {
-        totalTimeText = moment(videoplayer.duration * 1000).format('mm:ss')
+    timerText = moment(videoPlayer.currentTime * 1000).format('mm:ss')
+    if (!isNaN(videoPlayer.duration)) {
+        totalTimeText = moment(videoPlayer.duration * 1000).format('mm:ss')
         element.timerText.text(timerText + ' / ' + totalTimeText)
-        element.slider.val(100 * videoplayer.currentTime / videoplayer.duration)
+        element.slider.val(100 * videoPlayer.currentTime / videoPlayer.duration)
         element.slider.change()
     }
 }

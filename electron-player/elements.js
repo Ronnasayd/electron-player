@@ -1,6 +1,6 @@
 module.exports = {
     playerAndVideoControls: $('#player, .video-controls'),
-    player: $('#player'),
+    videoPlayer: $('#player')[0],
     videoControls: $('.video-controls'),
     playPauseButton: $('.pp-button'),
     playButton: $("#play-button"),
@@ -20,4 +20,6 @@ module.exports = {
     sliderSound: $('.slider-sound'),
     playList: $('#play-list'),
     sideMenu: $('.side-menu'),
+    videoPlayerContainer: $('.video-player')[0],
+    preLoadingBanner: $('.initial-message'),
 }
