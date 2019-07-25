@@ -1,11 +1,11 @@
 {
   "name": "electron-player",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A minimal Electron player",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "gulp": "gulp",
+    "gulp": "gulp & electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },

@@ -1,3 +1,4 @@
+'use strict'
 // Requires
 const VideoLib = require('node-video-lib');
 const fileSystem = require('fs');
@@ -8,6 +9,8 @@ const moment = require('moment')
 
 // Initial variables
 const firstElement = 0
+const forwardAndBackwardStep = 10
+const sliderSoundStep = 10
 let togglePlayAndPause = ['play', 'pause'].reverse()
 let videoPlayer = element.videoPlayer
 let videoPlayerContainer = element.videoPlayerContainer
@@ -26,6 +29,8 @@ let videoPlayList = []
 let counterGenerateThumbmail = 0
 let mouseIOTimerController;
 let isInFullscreen = false
+let thumbmailFolderAbsolutePath
+
 
 // Initialize vue vueApplication
 vueApplication = new Vue({
@@ -35,25 +40,30 @@ vueApplication = new Vue({
     },
     methods: {
         jump: (file) => {
-            // console.log(file.path)
             videoPlayer.src = file.path
             videoPlayer.play()
-            notification = new Notification(file.title)
-            setTimeout(notification.close.bind(notification), 2000);
-            setInterval(main, 1000)
+            showSystemNotification(file.title)
+            // setInterval(main, 1000)
             currentVideo = file.counter
             initializeVariablesByCurrentVideo(currentVideo)
         }
     }
 })
 
-resetVariables = () => {
+const showSystemNotification = (notificationTitle) => {
+    const notificationTime = 3000;
+    let notification = new Notification(notificationTitle);
+    setTimeout(notification.close.bind(notification), notificationTime);
+};
+
+
+const resetVariables = () => {
     counterGenerateThumbmail = 0;
     currentVideo = 0;
     videoPlayList = [];
 }
 
-getSkipFile = (files) => {
+const getSkipFile = (files) => {
     return files.find((file) => {
         if (file.fullPath.includes('.skip')) {
             return file
@@ -61,53 +71,52 @@ getSkipFile = (files) => {
     })
 }
 
-removePreLoadingBanner = () => {
+const removePreLoadingBanner = () => {
     element.preLoadingBanner.attr('data-display', 'false')
 }
 
-isSkipFileExists = (skipFile) => {
-    if (skipFile === undefined) {
-        return false
-    }
-    else {
-        return true
-    }
+const isSkipFileExists = (skipFile) => {
+    return !(skipFile === undefined)
 }
 
-getSkipList = (files) => {
-    skipFile = getSkipFile(files)
+const getSkipList = (files) => {
+    let skipFile = getSkipFile(files)
     if (isSkipFileExists(skipFile)) {
         return JSON.parse(fileSystem.readFileSync(skipFile.path, 'utf8'))
     }
     else {
-        return {}
+        return []
     }
 
 }
 
-renderActiveCurrentVideo = (currentVideo) => {
+const isSkipListLoaded = (skipList) => {
+    return skipList.length > 0
+}
+
+const renderActiveCurrentVideo = (currentVideo) => {
     $('#side-menu-ul > li').removeClass('isActive')
     setTimeout(() => {
         $('#side-menu-ul > li:nth-child(' + (currentVideo + 1).toString() + ')').addClass('isActive')
     }, 500)
 }
 
-getVideoFiles = (files) => {
+const getVideoFiles = (files) => {
     return files.filter((element) => {
         return videoIsSupported(element)
     })
 }
 
 
-getNameOfVideo = (video) => {
+const getNameOfVideo = (video) => {
     return video.fullPath.slice(video.fullPath.lastIndexOf('/') + 1).replace('.mp4', '')
 }
 
-sortVideoList = (files) => {
+const sortVideoList = (files) => {
     return files.sort(function (firstVideo, secondVideo) {
         if (videoIsSupported(firstVideo) && videoIsSupported(secondVideo)) {
-            nameOfFirstVideo = getNameOfVideo(firstVideo)
-            nameOfSecondVideo = getNameOfVideo(secondVideo)
+            let nameOfFirstVideo = getNameOfVideo(firstVideo)
+            let nameOfSecondVideo = getNameOfVideo(secondVideo)
             if (isNaN(nameOfFirstVideo) || isNaN(nameOfSecondVideo)) {
                 if (firstVideo.fullPath < secondVideo.fullPath) {
                     return -1
@@ -130,6 +139,51 @@ sortVideoList = (files) => {
     })
 }
 
+const getThumbmailAbsolutePath = () => {
+    let firstVideoIndex = videoList[firstElement].path.lastIndexOf('/')
+    return videoList[firstElement].path.slice(0, firstVideoIndex) + '/.thumb/'
+}
+
+const isThumbmailImagesAlreadyGeneratedPromise = () => {
+    return new Promise((resolve, reject) => {
+        fileSystem.readdir(thumbmailFolderAbsolutePath, (err, files) => {
+            if (files === undefined) {
+                resolve(false)
+            }
+            else {
+                resolve(!(files.length < videoList.length))
+            }
+        });
+    })
+
+
+}
+
+const loadVideoInPlaylist = (videoElement, videoElementIndex) => {
+    let videoFile = {}
+    fileSystem.open(videoElement.path, 'r', function (err, fd) {
+        try {
+            let movie = VideoLib.MovieParser.parse(fd);
+            videoFile.img = thumbmailFolderAbsolutePath + videoElement.name.replace(".mp4", "") + '-thumbnail-320x240-0001.png'
+            videoFile.title = videoElement.name
+            videoFile.time = moment(movie.relativeDuration() * 1000).format('mm:ss')
+            videoFile.path = videoElement.path
+            videoFile.counter = videoElementIndex
+            if (isSkipListLoaded(skipList)) {
+                videoFile.isPinned = ((videoElementIndex + 1) <= skipList.length)
+            }
+            else {
+                videoFile.isPinned = false
+            }
+
+            videoPlayList.push(JSON.parse(JSON.stringify(videoFile)))
+        } catch (ex) {
+            console.error('Error:', ex);
+        } finally {
+            fileSystem.closeSync(fd);
+        }
+    });
+}
 // Event functions 
 dragDrop('body', function (files) {
     resetVariables()
@@ -138,67 +192,31 @@ dragDrop('body', function (files) {
     initializeVariablesByCurrentVideo(currentVideo)
     files = getVideoFiles(files)
     videoList = sortVideoList(files)
-    console.log(videoList)
-    index = videoList[firstElement].path.lastIndexOf('/')
+    thumbmailFolderAbsolutePath = getThumbmailAbsolutePath()
 
-    // console.log(videoList)
-    videoList.forEach((e, i) => {
-        file = {}
-        index = videoList[firstElement].path.lastIndexOf('/')
-        videoList[firstElement].path.slice(0, index)
-
-
-        fileSystem.readdir(videoList[firstElement].path.slice(0, index) + '/.thumb', (err, files) => {
-            try {
-                if (files.length < videoList.length) {
-                    generateThumbs(e)
-                }
-                else {
+    videoList.forEach((videoElement, videoElementIndex) => {
+        isThumbmailImagesAlreadyGeneratedPromise()
+            .then((booleanValue) => {
+                if (booleanValue) {
+                    // console.log("imagens ja existem")
                     vueApplication.files = videoPlayList
                     renderActiveCurrentVideo(0)
                 }
-
-            }
-            catch (err) {
-                generateThumbs(e)
-            }
-
-        })
-
-
-        fileSystem.open(e.path, 'r', function (err, fd) {
-            try {
-                let movie = VideoLib.MovieParser.parse(fd);
-                file.img = videoList[firstElement].path.slice(0, index) + '/.thumb/' + e.name.replace(".mp4", "") + '-thumbnail-320x240-0001.png'
-                file.title = e.name
-                file.time = moment(movie.relativeDuration() * 1000).format('mm:ss')
-                file.path = e.path
-                file.counter = i
-                if (skipList.length > 0) {
-                    file.isPinned = ((i + 1) <= skipList.length)
-                }
                 else {
-                    file.isPinned = false
+                    // console.log("imagens nao existem")
+                    generateThumbmailImage(videoElement, videoElementIndex)
                 }
+            })
 
-                videoPlayList.push(JSON.parse(JSON.stringify(file)))
-                // Work with movie
-                // console.log('Duration:',
-                //     moment(movie.relativeDuration() * 1000).format('mm:ss')
-                // );
-            } catch (ex) {
-                console.error('Error:', ex);
-            } finally {
-                fileSystem.closeSync(fd);
-            }
-        });
+
+        loadVideoInPlaylist(videoElement, videoElementIndex)
+
 
 
     })
     videoPlayer.src = videoList[currentVideo].path
     videoPlayer.play()
-    notification = new Notification(videoList[currentVideo].name)
-    setTimeout(notification.close.bind(notification), 2000);
+    showSystemNotification(videoList[currentVideo].name)
     setInterval(main, 1000)
 })
 
@@ -258,13 +276,13 @@ element.fullscrean.click(function () {
 })
 
 element.stepPrevious.click(function () {
-    videoPlayer.currentTime = videoPlayer.currentTime - 10
+    videoPlayer.currentTime = videoPlayer.currentTime - forwardAndBackwardStep
     element.slider.val(100 * videoPlayer.currentTime / videoPlayer.duration)
     element.slider.change()
 })
 
 element.stepNext.click(function () {
-    videoPlayer.currentTime = videoPlayer.currentTime + 10
+    videoPlayer.currentTime = videoPlayer.currentTime + forwardAndBackwardStep
     element.slider.val(100 * videoPlayer.currentTime / videoPlayer.duration)
     element.slider.change()
 })
@@ -283,8 +301,7 @@ videoPlayer.onended = function () {
     videoPlayer.src = videoList[currentVideo].path
     videoPlayer.play()
     initializeVariablesByCurrentVideo(currentVideo)
-    notification = new Notification(videoList[currentVideo].name)
-    setTimeout(notification.close.bind(notification), 2000);
+    showSystemNotification(videoList[currentVideo].name)
 }
 
 element.next.click(function () {
@@ -294,8 +311,8 @@ element.next.click(function () {
     videoPlayer.src = videoList[currentVideo].path
     videoPlayer.play()
     initializeVariablesByCurrentVideo(currentVideo)
-    notification = new Notification(videoList[currentVideo].name)
-    setTimeout(notification.close.bind(notification), 2000);
+    showSystemNotification(videoList[currentVideo].name)
+
 
 })
 
@@ -307,8 +324,7 @@ element.previous.click(function () {
     videoPlayer.src = videoList[currentVideo].path
     videoPlayer.play()
     initializeVariablesByCurrentVideo(currentVideo)
-    notification = new Notification(videoList[currentVideo].name)
-    setTimeout(notification.close.bind(notification), 2000);
+    showSystemNotification(videoList[currentVideo].name)
 
 })
 
@@ -326,10 +342,13 @@ element.pinButton.click(function () {
             skipStages.startOfCredits = videoPlayer.currentTime
             skipList[currentVideo] = { [currentVideo]: JSON.parse(JSON.stringify(skipStages)) }
             skipStages = { 'startOfOpening': 0, 'endOfOpening': 0, 'startOfCredits': 0 }
-            index = videoList[firstElement].path.lastIndexOf('/')
+            let index = videoList[firstElement].path.lastIndexOf('/')
             vueApplication.files[currentVideo].isPinned = true
             fileSystem.writeFile(videoList[firstElement].path.slice(0, index) + '/electron.skip', JSON.stringify(skipList), (err) => {
-                console.log(err)
+                if (err) {
+                    return console.log(err);
+                }
+                console.log("New video skip saved")
             })
             break;
     }
@@ -397,13 +416,13 @@ onkeydown = (event) => {
             break;
         case "ArrowUp":
             // console.log(element.sliderSound.val())
-            element.sliderSound.val(parseFloat(element.sliderSound.val()) + 10)
+            element.sliderSound.val(parseFloat(element.sliderSound.val()) + sliderSoundStep)
             element.sound.click()
             element.sliderSound.change()
             break;
         case "ArrowDown":
             // console.log("Down")
-            element.sliderSound.val(parseFloat(element.sliderSound.val()) - 10)
+            element.sliderSound.val(parseFloat(element.sliderSound.val()) - sliderSoundStep)
             element.sound.click()
             element.sliderSound.change()
             break;
@@ -429,7 +448,7 @@ $('.slider').mouseout((e) => {
 
 
 // Auxiliar functions
-let skipSwitch = () => {
+const skipSwitch = () => {
     switch (skipMode) {
         case "0":
             element.pinButton.fadeIn()
@@ -460,48 +479,63 @@ let skipSwitch = () => {
 
 
 
-let initializeVariablesByCurrentVideo = (currentVideo) => {
+const initializeVariablesByCurrentVideo = (currentVideo) => {
     renderActiveCurrentVideo(currentVideo)
-    skipList.filter((element, index) => {
-        if (index === currentVideo) {
-            startOfOpening = element[index].startOfOpening
-            endOfOpening = element[index].endOfOpening
-            startOfCredits = element[index].startOfCredits
-            return element
-        }
-    })
+    // console.log(skipList)
+    if (isSkipListLoaded(skipList)) {
+        skipList.filter((element, index) => {
+            if (index === currentVideo) {
+                startOfOpening = element[index].startOfOpening
+                endOfOpening = element[index].endOfOpening
+                startOfCredits = element[index].startOfCredits
+                return element
+            }
+        })
+    }
+
 }
 
-let videoIsSupported = (file) => {
-    summation = 0
+const videoIsSupported = (file) => {
+    let summation = 0
     supportedVideoTypes.forEach((element, index) => {
         summation += file.fullPath.includes(element)
     })
     return Boolean(summation)
 }
 
-let generateThumbs = (e) => {
-    const tg = new ThumbnailGenerator({
-        sourcePath: e.path,
-        thumbnailPath: videoList[firstElement].path.slice(0, index) + '/.thumb',
-        tmpDir: '/some/writeable/directory' //only required if you can't write to /tmp/ and you need to generate gifs
-    });
-    tg.generateOneByPercent(100 / 3)
-        .then(() => {
-            counterGenerateThumbmail++
-            if (counterGenerateThumbmail === videoList.length) {
-                vueApplication.files = videoPlayList
-                renderActiveCurrentVideo(0)
-            }
-        });
+const generateThumbmailImage = (videoElement, videoElementIndex) => {
+    setTimeout(() => {
+        try {
+            // console.log(videoElement.path)
+            let thumbmailImageGenerator = new ThumbnailGenerator({
+                sourcePath: videoElement.path,
+                thumbnailPath: thumbmailFolderAbsolutePath,
+                tmpDir: '/some/writeable/directory' //only required if you can't write to /tmp/ and you need to generate gifs
+            });
+            thumbmailImageGenerator.generateOneByPercent(100 / 3)
+                .then(() => {
+                    counterGenerateThumbmail++
+                    console.log(counterGenerateThumbmail)
+                    if (counterGenerateThumbmail === videoList.length) {
+                        vueApplication.files = videoPlayList
+                        renderActiveCurrentVideo(0)
+                    }
+                });
+        }
+        catch (err) {
+            console.error(err)
+        }
+    }, videoElementIndex * 200)
+
+
 }
 
 // Main function
-let main = () => {
+const main = () => {
     skipSwitch()
-    timerText = moment(videoPlayer.currentTime * 1000).format('mm:ss')
+    let timerText = moment(videoPlayer.currentTime * 1000).format('mm:ss')
     if (!isNaN(videoPlayer.duration)) {
-        totalTimeText = moment(videoPlayer.duration * 1000).format('mm:ss')
+        let totalTimeText = moment(videoPlayer.duration * 1000).format('mm:ss')
         element.timerText.text(timerText + ' / ' + totalTimeText)
         element.slider.val(100 * videoPlayer.currentTime / videoPlayer.duration)
         element.slider.change()
